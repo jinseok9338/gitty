@@ -1,14 +1,23 @@
+use std::path::PathBuf;
+
 use git2::{BranchType, Branches, Error, Remote, Repository};
 
 pub struct GitWork {}
 
 impl GitWork {
     //for cloining the repository
-    pub fn clone_repo(&self, url: &str, directory: &str) -> Result<Repository, Error> {
+    pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> {
         let repo = match Repository::clone(url, directory) {
             //if okay then return the repository in result enum
             Ok(repo) => Ok(repo),
-            Err(e) => Err(Error::new(e.code(), e.class(), e.message())),
+            // if the repository is already cloned then return the repository in result enum
+            Err(e) if e.code() == git2::ErrorCode::Exists => {
+                let repo = Repository::open(directory)?;
+                Ok(repo)
+            }
+            // if the repository is not cloned then return the error in result enum
+            Err(e) => Err(e),
+
         };
         return repo;
     }
@@ -32,7 +41,7 @@ impl GitWork {
     }
 
     // return all branches in remote repository
-    pub fn show_remote_branches<'a>(&'a self, repo: &'a Repository) -> Result<Box<Remote>, Error> {
+    pub fn remote<'a>(&'a self, repo: &'a Repository) -> Result<Box<Remote>, Error> {
         let remote = repo.find_remote("origin");
         let branches = remote.unwrap();
         let branches = Box::new(branches);
