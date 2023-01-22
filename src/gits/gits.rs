@@ -1,4 +1,4 @@
-use git2::{BranchType, Branches, Error, Remote, RemoteHead, Repository};
+use git2::{BranchType, Branches, Error, Remote, Repository};
 
 pub struct GitWork {}
 
