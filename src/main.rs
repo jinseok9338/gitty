@@ -12,7 +12,4 @@ fn main() {
 
     let directory = sys_work.currnet_dir(&args.directory).unwrap();
     println!("The directory chosen is: {}", directory.display());
-
-
-    
 }
