@@ -17,7 +17,6 @@ impl GitWork {
             }
             // if the repository is not cloned then return the error in result enum
             Err(e) => Err(e),
-
         };
         return repo;
     }
