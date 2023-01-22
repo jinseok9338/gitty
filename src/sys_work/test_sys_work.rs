@@ -21,10 +21,10 @@ mod sys_work_tests {
     #[test]
     fn current_dir() {
         let inputs = vec![
-            ("test", env::current_dir().unwrap()),
-            ("./", PathBuf::from("./")),
-            (".", PathBuf::from(".")),
-            ("../", PathBuf::from("../")),
+            (Option::from("test".to_owned()), env::current_dir().unwrap()),
+            (Option::from("./".to_owned()), PathBuf::from("./")),
+            (Option::from(".".to_owned()), PathBuf::from(".")),
+            (Option::from("../".to_owned()), PathBuf::from("../")),
         ];
 
         let sys_work = SysWork {};

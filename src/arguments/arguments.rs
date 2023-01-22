@@ -1,22 +1,36 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
+
+#[derive(PartialEq)]
+pub enum PositionalArgs {
+    //up
+    Up(String),
+    Log(String),
+}
 
 #[derive(Parser, Debug)]
-#[command(author="Jinseok Seo", version="1.0.0", about, long_about = None)]
+#[command(name = "Gitty")]
+#[command(author = "Jinseok seo Jinseok9338@gmail.com")]
+#[command(version = "1.0")]
+#[command(about = "Gitty tool", long_about = None)]
 pub struct Args {
-    /// Name of the person to greet
-    //not required
-    #[arg(short, long, default_value = "")]
-    pub name: String,
-
-    /// Number of times to greet
-    #[arg(short, long, default_value_t = 1)]
-    pub count: u8,
+    pub up: Option<String>,
 
     /// URL for cloning the repository
-    #[arg(short, long, default_value = "")]
-    pub url: String,
+    #[arg(short, long)]
+    pub url: Option<String>,
 
     /// Directory to clone the repository
     #[arg(short, long)]
-    pub directory: String,
+    pub directory: Option<String>,
+}
+
+impl Args {
+    pub fn new() -> Self {
+        Self::parse()
+        //if there is no up value return the error
+    }
+
+    pub fn print_args(&self) {
+        println!("{:?}", self);
+    }
 }

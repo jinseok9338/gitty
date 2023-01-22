@@ -12,8 +12,8 @@ impl SysWork {
         }
     }
 
-    pub fn currnet_dir(&self, directory: &str) -> Result<PathBuf, Box<dyn Error>> {
-        let directory = PathBuf::from(directory);
+    pub fn currnet_dir(&self, directory: &Option<String>) -> Result<PathBuf, Box<dyn Error>> {
+        let directory = PathBuf::from(directory.as_ref().unwrap());
         if self.check_dir(&directory).unwrap() {
             return Ok(directory.into());
         }
