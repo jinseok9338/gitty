@@ -1,6 +1,6 @@
 mod arguments;
-mod sys_work;
 mod gits;
+mod sys_work;
 
 use crate::sys_work::sys_work::SysWork;
 use arguments::arguments::Args;
