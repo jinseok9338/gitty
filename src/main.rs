@@ -12,5 +12,9 @@ fn main() {
     //call syswork struct and get the current directory
 
     let directory = sys_work.currnet_dir(&args.directory).unwrap();
-    println!("The directory chosen is: {}", directory.display());
+    let gits = gits::gits::GitWork {};
+
+    let repo = gits.clone_repo(&args.url, &directory).unwrap();
+    let remote = gits.remote(&repo).unwrap();
+    println!("Remote name: {}", remote.name().unwrap());
 }
