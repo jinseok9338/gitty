@@ -12,11 +12,7 @@ fn main() {
     let sys_work = SysWork {};
     //call syswork struct and get the current directory
     // if no up value is provided, return the error
-    if args.up.is_none()
-        || PositionalArgs::Up(args.up.unwrap()) != PositionalArgs::Up("up".to_string())
-    {
-        panic!("No up value provided");
-    }
+
 
     // let directory = sys_work.currnet_dir(&args.directory).unwrap();
     // let gits = gits::gits::GitWork {};
