@@ -48,13 +48,14 @@ impl GitWork {
     }
 
     //list all remote branes in remote repo
-    pub fn list_remote_branches(&self, remote: &Remote) -> Result<Vec<String>, Error>   {
+    pub fn list_remote_branches(&self, remote: &Remote) -> Result<Vec<String>, Error> {
         let branches = remote.list()?;
         let remote_branches = branches
             .iter()
             .filter(|branch| branch.name().starts_with("refs/heads/"))
-            .map(|branch| branch.name().replace("refs/heads/", "")).collect();
-      
+            .map(|branch| branch.name().replace("refs/heads/", ""))
+            .collect();
+
         Ok(remote_branches)
     }
 
@@ -80,6 +81,4 @@ impl GitWork {
         }
         difference_branches
     }
-
-
 }
