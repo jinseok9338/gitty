@@ -1,10 +1,18 @@
+
+
+
+
 use clap::{Parser, Subcommand};
 
+#[derive(Default)]
 #[derive(PartialEq)]
 pub enum PositionalArgs {
-    //up
+   
     Up,
     Log,
+    #[default]
+    Other 
+
 }
 
 #[derive(Parser, Debug)]
@@ -30,6 +38,7 @@ impl Args {
         //if there is no up value return the error
     }
 
+    // only for debugging delete when release
     pub fn print_args(&self) {
         println!("{:?}", self);
     }
@@ -37,22 +46,17 @@ impl Args {
     pub fn parse_first_args(&self, first_arg: PositionalArgs, restArgs: Args) {
         match first_arg {
             PositionalArgs::Up => {
-                if self.first_arg.is_some() {
-                    // do gitty up task
-                    // if no argument is provided, return sync local repo with remote repo
+                // do gitty up task
 
-                    //if restArgs.url.is_some() && restArgs.directory.is_some() {} // do gitty up task with url and directory
-
-                    // if only restArgs.url is provided  // clone the git repo and sync with remote repo at the current directory
-
-                    // if only restArgs.directory is provided // sync local repo with remote repo if there is git repo in the directory
-                }
             }
             PositionalArgs::Log => {
-                if self.first_arg.is_some() {
-                    // do gitty log task
-                }
+            // do gitty log task
             }
+            _ => {
+                // throw error
+
+            }
+       
         }
     }
 }

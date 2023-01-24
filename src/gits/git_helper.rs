@@ -2,9 +2,15 @@ use std::path::PathBuf;
 
 use git2::{BranchType, Branches, Error, Remote, Repository};
 
-pub struct GitWork {}
+pub struct GitHelper {}
 
-impl GitWork {
+impl GitHelper {
+    pub fn new() -> Self{
+        Self {  
+            
+        }
+    }
+
     //for cloining the repository
     pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> {
         let repo = match Repository::clone(url, directory) {

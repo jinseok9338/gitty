@@ -2,18 +2,59 @@ mod arguments;
 mod gits;
 mod logs;
 mod sys_work;
+mod app;
+mod consts;
 
-use crate::sys_work::sys_work::SysWork;
-use arguments::arguments::{Args, PositionalArgs};
+extern crate termion;
+
+
+
+use arguments::{multiselect::MultiSelect, secret::Secret, confirm::Confirm, input::Input, select::Select};
+use clap::Parser;
+use dialoguer::console::set_colors_enabled;
+
+
+
+#[derive(Debug, Parser)]
+#[clap(name = "enquirer", version)]
+struct Enquirer {
+    #[clap(subcommand)]
+    cmd: EnquirerSubcommand,
+
+    /// Disable colors in the prompt
+    #[clap(long)]
+    no_color: bool,
+}
+
+#[derive(Debug, Parser)]
+enum EnquirerSubcommand {
+    Confirm(Confirm),
+    Input(Input),
+    Secret(Secret),
+    MultiSelect(MultiSelect),
+    Select(Select),
+   
+}
+
 
 fn main() {
-    let args = Args::new();
-    //allow positional arguments
+        // TODO: Specify height for selection prompts (like fzf)
+        let program = Enquirer::parse();
+        set_colors_enabled(!program.no_color);
+        match program.cmd {
+            EnquirerSubcommand::Confirm(x) => x.run(),
+            EnquirerSubcommand::Input(x) => x.run(),
+            EnquirerSubcommand::Secret(x) => x.run(),
+            EnquirerSubcommand::MultiSelect(x) => x.run(),
+            EnquirerSubcommand::Select(x) => x.run(),
+        }
+        .unwrap();
 
-    let sys_work = SysWork {};
-    //call syswork struct and get the current directory
-    // if no up value is provided, return the error
-
-    // let directory = sys_work.currnet_dir(&args.directory).unwrap();
-    // let gits = gits::gits::GitWork {};
 }
+
+
+
+
+
+
+
