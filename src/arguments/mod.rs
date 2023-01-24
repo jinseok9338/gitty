@@ -1,4 +1,4 @@
-pub mod arguments;
+pub mod enquirer;
 pub mod confirm;
 pub mod input;
 pub mod multiselect;
