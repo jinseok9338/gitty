@@ -1,16 +1,15 @@
-use std::{path::PathBuf, error::Error};
+use std::{error::Error, path::PathBuf};
 
 use super::git_helper::GitHelper;
 
 struct GitWork {
-    git_helper: GitHelper
+    git_helper: GitHelper,
 }
-
 
 impl GitWork {
     pub fn new() -> Self {
         Self {
-            git_helper: GitHelper::new()
+            git_helper: GitHelper::new(),
         }
     }
 
@@ -19,5 +18,4 @@ impl GitWork {
         //check if the folder is empty
         Ok(())
     }
-
 }

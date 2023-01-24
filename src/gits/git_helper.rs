@@ -5,10 +5,8 @@ use git2::{BranchType, Branches, Error, Remote, Repository};
 pub struct GitHelper {}
 
 impl GitHelper {
-    pub fn new() -> Self{
-        Self {  
-            
-        }
+    pub fn new() -> Self {
+        Self {}
     }
 
     //for cloining the repository

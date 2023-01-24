@@ -1,4 +1,3 @@
-
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
 use std::{io::Result, iter::repeat};
@@ -94,4 +93,3 @@ impl MultiSelect {
         Ok(())
     }
 }
-

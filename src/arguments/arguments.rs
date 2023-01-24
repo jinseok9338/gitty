@@ -1,18 +1,11 @@
-
-
-
-
 use clap::{Parser, Subcommand};
 
-#[derive(Default)]
-#[derive(PartialEq)]
+#[derive(Default, PartialEq)]
 pub enum PositionalArgs {
-   
     Up,
     Log,
     #[default]
-    Other 
-
+    Other,
 }
 
 #[derive(Parser, Debug)]
@@ -47,16 +40,13 @@ impl Args {
         match first_arg {
             PositionalArgs::Up => {
                 // do gitty up task
-
             }
             PositionalArgs::Log => {
-            // do gitty log task
+                // do gitty log task
             }
             _ => {
                 // throw error
-
             }
-       
         }
     }
 }
