@@ -34,7 +34,6 @@ enum EnquirerSubcommand {
 }
 
 fn main() {
-    // TODO: Specify height for selection prompts (like fzf)
     let program = Enquirer::parse();
     set_colors_enabled(!program.no_color);
     match program.cmd {
