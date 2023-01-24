@@ -42,20 +42,44 @@ impl GitWork {
     // return all branches in remote repository
     pub fn remote<'a>(&'a self, repo: &'a Repository) -> Result<Box<Remote>, Error> {
         let remote = repo.find_remote("origin");
-        let branches = remote.unwrap();
-        let branches = Box::new(branches);
-        Ok(branches)
+        let remote = remote.unwrap();
+        let remote = Box::new(remote);
+        Ok(remote)
     }
 
-    //return all local branches in repository as Branches enum
-    pub fn get_local_branches<'a>(
-        &'a self,
-        repo: &'a Repository,
-        filter: Option<BranchType>,
-    ) -> Result<Box<Branches>, Error> {
-        let branches = repo.branches(filter);
-        let branches = branches.unwrap();
-        let branches = Box::new(branches);
-        Ok(branches)
+    //list all remote branes in remote repo
+    pub fn list_remote_branches(&self, remote: &Remote) -> Result<Vec<String>, Error>   {
+        let branches = remote.list()?;
+        let remote_branches = branches
+            .iter()
+            .filter(|branch| branch.name().starts_with("refs/heads/"))
+            .map(|branch| branch.name().replace("refs/heads/", "")).collect();
+      
+        Ok(remote_branches)
     }
+
+    pub fn list_local_branches(&self, repo: &Repository) -> Result<Vec<String>, Error> {
+        let branches = repo.branches(None)?;
+        let local_branches = branches
+            .map(|branch| branch.unwrap().0.name().unwrap().unwrap().to_string())
+            .collect();
+        Ok(local_branches)
+    }
+
+    // list remote branches that are not in local repository
+    pub fn list_differece_branches(
+        &self,
+        local_branches: &Vec<String>,
+        remote_branches: &Vec<String>,
+    ) -> Vec<String> {
+        let mut difference_branches = Vec::new();
+        for remote_branch in remote_branches {
+            if !local_branches.contains(remote_branch) {
+                difference_branches.push(remote_branch.to_string());
+            }
+        }
+        difference_branches
+    }
+
+
 }
