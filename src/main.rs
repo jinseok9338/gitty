@@ -3,7 +3,6 @@ mod arguments;
 mod consts;
 mod gits;
 mod logs;
-mod sys_work;
 
 extern crate termion;
 
@@ -47,6 +46,8 @@ fn main() {
     }
 
     let program = program.transform_enquirer();
+
+    // loop until the condition is met
 
     //print values
     println!("{:?}", program);

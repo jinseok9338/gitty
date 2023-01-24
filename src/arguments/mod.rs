@@ -4,3 +4,4 @@ pub mod input;
 pub mod multiselect;
 pub mod secret;
 pub mod select;
+pub mod test;
