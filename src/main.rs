@@ -7,17 +7,12 @@ mod sys_work;
 
 extern crate termion;
 
-
 use arguments::{
     confirm::Confirm, input::Input, multiselect::MultiSelect, secret::Secret, select::Select,
 };
 use clap::Parser;
 
-
 use crate::arguments::enquirer::Enquirer;
-
-
-
 
 #[derive(Debug, Parser)]
 enum EnquirerSubcommand {
@@ -51,10 +46,8 @@ fn main() {
         std::process::exit(1);
     }
 
-
     let program = program.transform_enquirer();
-  
-    //print values 
-    println!("{:?}", program);
 
+    //print values
+    println!("{:?}", program);
 }
