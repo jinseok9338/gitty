@@ -12,4 +12,8 @@ enquirer = "0.6.1"
 termion = "2.0.1"
 dialoguer = "0.10.3"
 url = "2.3.1"
+reqwest = { version = "0.11.6", features = ["blocking", "json"] }
+serde = { version = "1.0.130", features = ["derive"] }
+tokio ={ version = "1.24.2", features = ["full"]  }
+futures = "0.3.25"
 

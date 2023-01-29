@@ -1,9 +1,10 @@
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
-use std::{io::Result, iter::repeat};
+use std::{io::Result, iter::repeat, error::Error};
+use super::common_trait::{Default, Run};
 
 /// Prompt that allows the user to select multiple items from a list of options
-#[derive(Debug, Parser, Default)]
+#[derive(Debug, Parser)]
 pub struct MultiSelect {
     /// Message for the prompt
     #[clap(short, long)]
@@ -17,6 +18,7 @@ pub struct MultiSelect {
     #[clap(short = 'd', long = "default", requires = "cancel")]
     return_default: bool,
 
+    
     /// Returns index of the selected items instead of items itself
     #[clap(short, long)]
     index: bool,
@@ -31,14 +33,16 @@ pub struct MultiSelect {
 
     /// Items that can be selected
     items: Vec<String>,
+
+    
 }
 
-impl MultiSelect {
-    pub fn run(&self) -> Result<()> {
+impl Run<Vec<usize>,std::io::Error> for MultiSelect {
+     fn run(&self) -> Result<Vec<usize>> {
         let item_len = self.items.len();
 
         if item_len == 0 {
-            return Ok(());
+            return Ok(vec![]);
         }
 
         let theme = ColorfulTheme {
@@ -73,32 +77,28 @@ impl MultiSelect {
 
         let value = match ret {
             Some(value) => value,
-            None if self.return_default => defaults
-                .into_iter()
-                .enumerate()
-                .filter_map(|(i, v)| if v { Some(i) } else { None })
-                .collect(),
-            None => std::process::exit(1),
+            None => vec![],
         };
 
-        if self.index {
-            for i in value {
-                println!("{}", i);
-            }
-        } else {
-            for i in value {
-                println!("{}", self.items[i]);
-            }
-        }
+        //return value as result 
+        Ok(value)
 
-        Ok(())
+     
+
+      
     }
 }
 
-// return the vec of selected items
-// impl ReturnValue<Vec<&str>> for MultiSelect {
-//     fn return_value<'a>(&self) -> Option<Vec<&'a str>> {
-//         //return the selected items as vec of &str
-//         Some(self.items.iter().map(|s| s.as_str()).collect())
-//     }
-// }
+impl Default for MultiSelect {
+    fn default(message: &str, can_be_nullable: Option<bool>, items:Option<Vec<String>>) -> Self {
+        Self {
+            message: message.to_string(),
+            return_default: false,
+            no_inline: false,
+            cancel: can_be_nullable.unwrap_or(false),
+            index: false,
+            selected: vec![],
+            items: items.unwrap_or(vec![]),
+        }
+    }
+}

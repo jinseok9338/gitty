@@ -6,15 +6,18 @@ mod logs;
 
 extern crate termion;
 
+use std::path::PathBuf;
+
+use tokio::{self};
 use arguments::{
     confirm::Confirm, input::Input, multiselect::MultiSelect, secret::Secret, select::Select,
 };
 use clap::Parser;
 
-use crate::arguments::{
+use crate::{arguments::{
     common_trait::{Default, Run},
     enquirer::Enquirer,
-};
+}, gits::git_helper::GitHelper};
 
 #[derive(Debug, Parser)]
 enum EnquirerSubcommand {
@@ -25,7 +28,8 @@ enum EnquirerSubcommand {
     Select(Select),
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut program = Enquirer::parse();
 
     //if program.url is not None and is not a valid url, then error
@@ -43,7 +47,7 @@ fn main() {
 
     if program.directory.is_none() {
         loop {
-            let input = Input::default("Enter a directory:", Some(false));
+            let input = Input::default("Enter a directory:", Some(false), None);
             let value = input.run().unwrap();
             program.directory = Some(value);
             //if the value is not a valid directory, then error
@@ -57,7 +61,7 @@ fn main() {
 
     if program.url.is_none() {
         loop {
-            let input = Input::default("Enter a url:", Some(true));
+            let input = Input::default("Enter a url:", Some(true), None);
             let value = input.run().unwrap();
             //if the value is not empty, then set it
             if !value.is_empty() {
@@ -74,7 +78,33 @@ fn main() {
     }
 
     // do gitty work.
+  
+    // if the url is provided then check the repo related to the url and check the branches
+    if program.url.is_some() {
+        let git_helper = GitHelper::new();
+        let url = program.url.clone().unwrap();
+        // wait for remote branches
+        let remote_branches = git_helper.remote_branches(&url).await;
+        let remote_branches = remote_branches.unwrap();
+        println!("remote branches: {:?}", remote_branches);
 
-    //print values
-    println!("{:?}", program);
+        // spawn multiselect with message choose the branches to pull
+        let multiselect = MultiSelect::default("Choose the branches to pull:", Some(false), Some(remote_branches));
+        let selected_branches = multiselect.run().unwrap();
+        println!("multiselect: {:?}", selected_branches);
+        // git clone then git pull on the selected branches
+        // directory as &PathBuf
+        let directory = program.directory.clone().unwrap();
+        let directory:PathBuf = directory.into(); 
+        // git clone
+        let cloned_repo = git_helper.clone_repo(&url, &directory).unwrap();
+        println!("cloned_repo: {:?}", cloned_repo.path());
+        // pull the selected branches
+   
+
+
+    }
+
+
+
 }
