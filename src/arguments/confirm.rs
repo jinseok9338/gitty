@@ -4,7 +4,7 @@ use dialoguer::theme::ColorfulTheme;
 use std::io::Result;
 
 /// Prompt that returns `true` or `false` (as strings)
-#[derive(Debug, Parser)]
+#[derive(Debug, Parser,Default)]
 pub struct Confirm {
     /// Message for the prompt
     #[clap(short, long)]

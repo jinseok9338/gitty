@@ -8,7 +8,7 @@ mod sys_work_tests {
         let inputs = vec![
             (
                 Enquirer {
-                    all: false,
+                 
                     directory: Option::from("test".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -16,7 +16,7 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-                    all: false,
+              
                     directory: Option::from("./".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -24,7 +24,7 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-                    all: false,
+            
                     directory: Option::from(".".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -32,7 +32,7 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-                    all: false,
+                 
                     directory: Option::from("../".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -41,7 +41,7 @@ mod sys_work_tests {
         ];
 
         for (enquirer, result) in inputs {
-            println!("{:?}", enquirer);
+            println!("{:?},- {}", enquirer, result);
             assert_eq!(enquirer.validate_directory(), result);
         }
     }
@@ -51,7 +51,7 @@ mod sys_work_tests {
         let inputs = vec![
             (
                 Enquirer {
-                    all: false,
+                  
                     directory: Option::from("test".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -59,7 +59,7 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-                    all: false,
+       
                     directory: Option::from("./".to_owned()),
                     url: Option::from("https://www.github.com".to_owned()),
                 },
@@ -67,7 +67,7 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-                    all: false,
+               
                     directory: Option::from(".".to_owned()),
                     url: Option::from("http://www.github.com".to_owned()),
                 },
@@ -75,7 +75,7 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-                    all: false,
+                  
                     directory: Option::from("../".to_owned()),
                     url: Option::from("www.google.com".to_owned()),
                 },
@@ -84,7 +84,7 @@ mod sys_work_tests {
         ];
 
         for (enquirer, result) in inputs {
-            println!("{:?}", enquirer);
+            println!("{:?},- {}", enquirer, result);
             assert_eq!(enquirer.validate_url(), result);
         }
     }

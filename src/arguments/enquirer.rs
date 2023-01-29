@@ -1,11 +1,13 @@
 use clap::Parser;
 use url::Url;
 
-#[derive(Debug, Parser)]
+
+
+
+#[derive(Debug, Parser,Default)]
 #[clap(name = "Gitty Up", version)]
 pub struct Enquirer {
-    #[clap(short, long)]
-    pub all: bool,
+ 
     #[clap(short, long)]
     pub directory: Option<String>,
     #[clap(short, long)]
@@ -13,44 +15,19 @@ pub struct Enquirer {
 }
 
 impl Enquirer {
-    pub fn transform_enquirer(&self) -> Self {
-        let directory = match self.all {
-            true => Some(
-                std::env::current_dir()
-                    .unwrap()
-                    .to_str()
-                    .unwrap()
-                    .to_string(),
-            ),
-            false => self.directory.clone(),
-        };
-        let directory = match directory {
-            Some(dir) => Some(dir),
-            None => Some(
-                std::env::current_dir()
-                    .unwrap()
-                    .to_str()
-                    .unwrap()
-                    .to_string(),
-            ),
-        };
-        let url = match self.all {
-            true => None,
-            false => self.url.clone(),
-        };
-        let all = self.all;
-        Self {
-            all,
-            directory,
-            url,
-        }
-    }
-
+   
+    // need to consider the fact that the url can be empty on purpose
     pub fn validate_url(&self) -> bool {
-        match Url::parse(self.url.clone().unwrap().as_str()) {
-            Ok(_) => true,
-            Err(_) => false,
+        if self.url.is_some(){
+            match Url::parse(self.url.clone().unwrap().as_str()) {
+                Ok(_) => true,
+                Err(_) => false,
+            }
         }
+        else{
+            true
+        }
+     
     }
 
     pub fn validate_directory(&self) -> bool {
@@ -61,3 +38,5 @@ impl Enquirer {
         }
     }
 }
+
+

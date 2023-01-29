@@ -4,7 +4,7 @@ use dialoguer::theme::ColorfulTheme;
 use std::io::Result;
 
 /// Prompt that allows the user to select from a list of options
-#[derive(Debug, Parser)]
+#[derive(Debug, Parser,Default)]
 pub struct Select {
     /// Message for the prompt
     #[clap(short, long)]

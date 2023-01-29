@@ -1,8 +1,9 @@
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
 use std::{io::Result, iter::repeat};
+
 /// Prompt that allows the user to select multiple items from a list of options
-#[derive(Debug, Parser)]
+#[derive(Debug, Parser,Default)]
 pub struct MultiSelect {
     /// Message for the prompt
     #[clap(short, long)]
@@ -93,3 +94,11 @@ impl MultiSelect {
         Ok(())
     }
 }
+
+// return the vec of selected items
+// impl ReturnValue<Vec<&str>> for MultiSelect {
+//     fn return_value<'a>(&self) -> Option<Vec<&'a str>> {
+//         //return the selected items as vec of &str
+//         Some(self.items.iter().map(|s| s.as_str()).collect())
+//     }
+// }
