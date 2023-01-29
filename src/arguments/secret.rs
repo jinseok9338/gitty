@@ -4,7 +4,7 @@ use dialoguer::theme::ColorfulTheme;
 use std::io::Result;
 
 /// Prompt that takes user input without showing it and returns a string
-#[derive(Debug, Parser,Default)]
+#[derive(Debug, Parser, Default)]
 pub struct Secret {
     /// Message for the prompt
     #[clap(short, long)]

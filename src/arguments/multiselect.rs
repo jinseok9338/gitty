@@ -3,7 +3,7 @@ use dialoguer::theme::ColorfulTheme;
 use std::{io::Result, iter::repeat};
 
 /// Prompt that allows the user to select multiple items from a list of options
-#[derive(Debug, Parser,Default)]
+#[derive(Debug, Parser, Default)]
 pub struct MultiSelect {
     /// Message for the prompt
     #[clap(short, long)]

@@ -8,7 +8,6 @@ mod sys_work_tests {
         let inputs = vec![
             (
                 Enquirer {
-                 
                     directory: Option::from("test".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -16,7 +15,6 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-              
                     directory: Option::from("./".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -24,7 +22,6 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-            
                     directory: Option::from(".".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -32,7 +29,6 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-                 
                     directory: Option::from("../".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -51,7 +47,6 @@ mod sys_work_tests {
         let inputs = vec![
             (
                 Enquirer {
-                  
                     directory: Option::from("test".to_owned()),
                     url: Option::from("test".to_owned()),
                 },
@@ -59,7 +54,6 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-       
                     directory: Option::from("./".to_owned()),
                     url: Option::from("https://www.github.com".to_owned()),
                 },
@@ -67,7 +61,6 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-               
                     directory: Option::from(".".to_owned()),
                     url: Option::from("http://www.github.com".to_owned()),
                 },
@@ -75,7 +68,6 @@ mod sys_work_tests {
             ),
             (
                 Enquirer {
-                  
                     directory: Option::from("../".to_owned()),
                     url: Option::from("www.google.com".to_owned()),
                 },

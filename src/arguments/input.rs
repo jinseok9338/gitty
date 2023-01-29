@@ -1,9 +1,7 @@
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
 
-
-
-use super::common_trait::{Run,Default};
+use super::common_trait::{Default, Run};
 
 /// Prompt that takes user input and returns a string.
 #[derive(Debug, Parser)]
@@ -19,11 +17,10 @@ pub struct Input {
     /// Allow empty input. Conflicts with `default`
     #[clap(short, long, conflicts_with = "default")]
     allow_empty: bool,
-
 }
 
 impl Run<String> for Input {
-     fn run(&self) -> Result<String, Box<dyn std::error::Error>>  {
+    fn run(&self) -> Result<String, Box<dyn std::error::Error>> {
         let theme = ColorfulTheme::default();
         let mut input = dialoguer::Input::<String>::with_theme(&theme);
 
@@ -44,11 +41,11 @@ impl Run<String> for Input {
 }
 
 impl Default for Input {
-    fn default(message:&str, can_be_nullable:Option<bool>) -> Self {
+    fn default(message: &str, can_be_nullable: Option<bool>) -> Self {
         Self {
             message: message.to_string(),
             default: None,
-        
+
             allow_empty: can_be_nullable.unwrap_or(false),
         }
     }
