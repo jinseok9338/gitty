@@ -19,7 +19,7 @@ pub struct Input {
     allow_empty: bool,
 }
 
-impl Run<String,Box<dyn std::error::Error>> for Input {
+impl Run<String, Box<dyn std::error::Error>> for Input {
     fn run(&self) -> Result<String, Box<dyn std::error::Error>> {
         let theme = ColorfulTheme::default();
         let mut input = dialoguer::Input::<String>::with_theme(&theme);
@@ -41,7 +41,7 @@ impl Run<String,Box<dyn std::error::Error>> for Input {
 }
 
 impl Default for Input {
-    fn default(message: &str, can_be_nullable: Option<bool>, items:Option<Vec<String>>) -> Self {
+    fn default(message: &str, can_be_nullable: Option<bool>, items: Option<Vec<String>>) -> Self {
         Self {
             message: message.to_string(),
             default: None,

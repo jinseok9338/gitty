@@ -8,16 +8,19 @@ extern crate termion;
 
 use std::path::PathBuf;
 
-use tokio::{self};
 use arguments::{
     confirm::Confirm, input::Input, multiselect::MultiSelect, secret::Secret, select::Select,
 };
 use clap::Parser;
+use tokio::{self};
 
-use crate::{arguments::{
-    common_trait::{Default, Run},
-    enquirer::Enquirer,
-}, gits::git_helper::GitHelper};
+use crate::{
+    arguments::{
+        common_trait::{Default, Run},
+        enquirer::Enquirer,
+    },
+    gits::git_helper::GitHelper,
+};
 
 #[derive(Debug, Parser)]
 enum EnquirerSubcommand {
@@ -78,7 +81,7 @@ async fn main() {
     }
 
     // do gitty work.
-  
+
     // if the url is provided then check the repo related to the url and check the branches
     if program.url.is_some() {
         let git_helper = GitHelper::new();
@@ -89,22 +92,20 @@ async fn main() {
         println!("remote branches: {:?}", remote_branches);
 
         // spawn multiselect with message choose the branches to pull
-        let multiselect = MultiSelect::default("Choose the branches to pull:", Some(false), Some(remote_branches));
+        let multiselect = MultiSelect::default(
+            "Choose the branches to pull:",
+            Some(false),
+            Some(remote_branches),
+        );
         let selected_branches = multiselect.run().unwrap();
         println!("multiselect: {:?}", selected_branches);
         // git clone then git pull on the selected branches
         // directory as &PathBuf
         let directory = program.directory.clone().unwrap();
-        let directory:PathBuf = directory.into(); 
+        let directory: PathBuf = directory.into();
         // git clone
         let cloned_repo = git_helper.clone_repo(&url, &directory).unwrap();
         println!("cloned_repo: {:?}", cloned_repo.path());
         // pull the selected branches
-   
-
-
     }
-
-
-
 }

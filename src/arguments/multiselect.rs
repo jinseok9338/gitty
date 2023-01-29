@@ -1,7 +1,7 @@
+use super::common_trait::{Default, Run};
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
-use std::{io::Result, iter::repeat, error::Error};
-use super::common_trait::{Default, Run};
+use std::{error::Error, io::Result, iter::repeat};
 
 /// Prompt that allows the user to select multiple items from a list of options
 #[derive(Debug, Parser)]
@@ -18,7 +18,6 @@ pub struct MultiSelect {
     #[clap(short = 'd', long = "default", requires = "cancel")]
     return_default: bool,
 
-    
     /// Returns index of the selected items instead of items itself
     #[clap(short, long)]
     index: bool,
@@ -33,12 +32,10 @@ pub struct MultiSelect {
 
     /// Items that can be selected
     items: Vec<String>,
-
-    
 }
 
-impl Run<Vec<usize>,std::io::Error> for MultiSelect {
-     fn run(&self) -> Result<Vec<usize>> {
+impl Run<Vec<usize>, std::io::Error> for MultiSelect {
+    fn run(&self) -> Result<Vec<usize>> {
         let item_len = self.items.len();
 
         if item_len == 0 {
@@ -80,17 +77,13 @@ impl Run<Vec<usize>,std::io::Error> for MultiSelect {
             None => vec![],
         };
 
-        //return value as result 
+        //return value as result
         Ok(value)
-
-     
-
-      
     }
 }
 
 impl Default for MultiSelect {
-    fn default(message: &str, can_be_nullable: Option<bool>, items:Option<Vec<String>>) -> Self {
+    fn default(message: &str, can_be_nullable: Option<bool>, items: Option<Vec<String>>) -> Self {
         Self {
             message: message.to_string(),
             return_default: false,

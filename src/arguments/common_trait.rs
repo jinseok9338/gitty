@@ -2,7 +2,7 @@
 
 use std::error::Error;
 
-pub trait Run<T,E> {
+pub trait Run<T, E> {
     fn run<'a>(&self) -> Result<T, E>;
 }
 

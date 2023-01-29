@@ -1,8 +1,11 @@
-use std::{path::PathBuf};
+use std::path::PathBuf;
 
 use git2::{BranchType, Branches, Error, Remote, Repository};
 
-use reqwest::{Client, ClientBuilder, header::{HeaderMap, USER_AGENT, HeaderValue}};
+use reqwest::{
+    header::{HeaderMap, HeaderValue, USER_AGENT},
+    Client, ClientBuilder,
+};
 use tokio::spawn;
 
 use super::r#type::Branch;
@@ -53,9 +56,9 @@ impl GitHelper {
     }
 
     // return all branches in remote repo with the url provided
-    pub async fn  remote_branches(&self, url: &str) -> ReqwestResult<Vec<String>> {
+    pub async fn remote_branches(&self, url: &str) -> ReqwestResult<Vec<String>> {
         // only get only jinseok/jinseok from string https://github.com/jinseok9338/jinseok9338.git
-      
+
         // Find the position of the '/' after '.com'
         let start = url.find(".com/").unwrap() + 5;
         // Find the position of the '.git
@@ -73,15 +76,15 @@ impl GitHelper {
             let response = client.get(&repo_url).headers(headers).send().await;
             let response = response.unwrap();
             let branches_names = response.json::<Vec<Branch>>().await.unwrap();
-            let branches_names:Vec<String> = branches_names
+            let branches_names: Vec<String> = branches_names
                 .iter()
                 .map(|branch| branch.name.to_string())
                 .collect();
 
             branches_names
         });
-            let branches_names = branches_names.await.unwrap();
-            Ok(branches_names)
+        let branches_names = branches_names.await.unwrap();
+        Ok(branches_names)
     }
 
     // return all branches in remote repository
