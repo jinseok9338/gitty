@@ -34,8 +34,8 @@ pub struct MultiSelect {
     items: Vec<String>,
 }
 
-impl Run<Vec<usize>, std::io::Error> for MultiSelect {
-    fn run(&self) -> Result<Vec<usize>> {
+impl Run<Vec<String>, std::io::Error> for MultiSelect {
+    fn run(&self) -> Result<Vec<String>> {
         let item_len = self.items.len();
 
         if item_len == 0 {
@@ -73,11 +73,19 @@ impl Run<Vec<usize>, std::io::Error> for MultiSelect {
         };
 
         let value = match ret {
-            Some(value) => value,
+            Some(value) => value
+            .iter()
+            .map(|i| self.items[*i].clone())
+            .collect::<Vec<String>>(),
             None => vec![],
         };
 
-        //return value as result
+        // transform the index to the actual value
+        let value = if self.index {
+            value
+        } else {
+            value
+        };
         Ok(value)
     }
 }

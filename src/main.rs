@@ -12,6 +12,7 @@ use arguments::{
     confirm::Confirm, input::Input, multiselect::MultiSelect, secret::Secret, select::Select,
 };
 use clap::Parser;
+use gits::git_work::GitWork;
 use tokio::{self};
 
 use crate::{
@@ -46,7 +47,6 @@ async fn main() {
         std::process::exit(1);
     }
 
-    // loop until the condition is met
 
     if program.directory.is_none() {
         loop {
@@ -84,28 +84,10 @@ async fn main() {
 
     // if the url is provided then check the repo related to the url and check the branches
     if program.url.is_some() {
-        let git_helper = GitHelper::new();
-        let url = program.url.clone().unwrap();
-        // wait for remote branches
-        let remote_branches = git_helper.remote_branches(&url).await;
-        let remote_branches = remote_branches.unwrap();
-        println!("remote branches: {:?}", remote_branches);
+        let git_work = GitWork::new();
+        let directory = program.directory.unwrap().into();
 
-        // spawn multiselect with message choose the branches to pull
-        let multiselect = MultiSelect::default(
-            "Choose the branches to pull:",
-            Some(false),
-            Some(remote_branches),
-        );
-        let selected_branches = multiselect.run().unwrap();
-        println!("multiselect: {:?}", selected_branches);
-        // git clone then git pull on the selected branches
-        // directory as &PathBuf
-        let directory = program.directory.clone().unwrap();
-        let directory: PathBuf = directory.into();
-        // git clone
-        let cloned_repo = git_helper.clone_repo(&url, &directory).unwrap();
-        println!("cloned_repo: {:?}", cloned_repo.path());
+        git_work.gitty_clone_repo(&program.url.unwrap(), &directory).await.unwrap();
         // pull the selected branches
     }
 }

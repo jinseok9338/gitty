@@ -1,10 +1,10 @@
 use std::path::PathBuf;
 
-use git2::{BranchType, Branches, Error, Remote, Repository};
+use git2::{ Error, Remote, Repository};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
-    Client, ClientBuilder,
+     ClientBuilder,
 };
 use tokio::spawn;
 
@@ -23,16 +23,13 @@ impl GitHelper {
 
     //for cloining the repository
     pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> {
-        let repo = match Repository::clone(url, directory) {
-            //if okay then return the repository in result enum
-            Ok(repo) => Ok(repo),
-            // if the directory is not empty then return the repository in result enum
-            Err(e) if e.code() == git2::ErrorCode::Exists => {
-                let repo = Repository::open(directory)?;
-                Ok(repo)
-            }
-            // if the repository is not cloned then return the error in result enum
-            Err(e) => Err(e),
+        // check if the directory is empty
+        let repo = if directory.is_dir() {
+            // if the directory is not empty then return the error in result enum
+            Err(Error::from_str("Directory is not empty"))
+        } else {
+            // if the directory is empty then clone the repository
+            Repository::clone(url, directory)
         };
         return repo;
     }
@@ -130,40 +127,21 @@ impl GitHelper {
         difference_branches
     }
 
-    // pub fn pull_branch(&self, branch:&str, repo:Repository){
-    //     // pull branch from remote repo to local repo
-    //     let mut remote = repo.find_remote("origin").unwrap();
-    //     let mut remote_branch = format!("refs/heads/{}", branch);
-    //     let mut local_branch = format!("refs/heads/{}", branch);
-    //     let mut refspecs = vec![&remote_branch[..], &local_branch[..]];
-    //     remote.fetch(&refspecs, None, None).unwrap();
-    //     let mut remote_branch = repo.find_reference(&remote_branch).unwrap();
-    //     let mut local_branch = repo.find_reference(&local_branch).unwrap();
-    //     let mut analysis = repo.merge_analysis(&[&remote_branch]).unwrap();
-    //     if analysis.0.is_up_to_date() {
-    //         println!("Already up-to-date!");
-    //     } else if analysis.0.is_fast_forward() {
-    //         println!("Fast-forwarding...");
-    //         let mut reference = repo.reference(&local_branch.name().unwrap(), remote_branch.target().unwrap(), true, "Fast-forward").unwrap();
-    //         repo.set_head(&reference.name().unwrap()).unwrap();
-    //         repo.checkout_head(None).unwrap();
-    //     } else {
-    //         println!("Merging...");
-    //         let mut index = repo.merge_commits(&local_branch.peel_to_commit().unwrap(), &remote_branch.peel_to_commit().unwrap(), None).unwrap();
-    //         if index.has_conflicts() {
-    //             println!("Conflicts!");
-    //         } else {
-    //             let mut tree_id = index.write_tree().unwrap();
-    //             let mut tree = repo.find_tree(tree_id).unwrap();
-    //             let mut sig = repo.signature().unwrap();
-    //             let mut parent = repo.head().unwrap();
-    //             let mut parent_commit = parent.peel_to_commit().unwrap();
-    //             let mut commit_id = repo.commit(Some("HEAD"), &sig, &sig, "Merge", &tree, &[&parent_commit]).unwrap();
-    //             let mut reference = repo.reference(&local_branch.name().unwrap(), commit_id, true, "Merge").unwrap();
-    //             repo.set_head(&reference.name().unwrap()).unwrap();
-    //             repo.checkout_head(None).unwrap();
-    //         }
-    //     }
+    pub fn add_remote_for_fetch(&self, repo: &Repository, url: &str) -> Result<(), Error> {
+        let remote_name = "origin";
+        let mut remote = repo.remote(remote_name, url)?;
+        // fetch from remote
+        remote.connect(git2::Direction::Fetch);
+        Ok(())
+    }
 
-    // }
+    pub fn create_local_branch(&self, repo: &Repository, branch_name: &str) -> Result<Branch, Error> {
+        
+        // repo head to repo commit 
+        
+        let branch = repo.branch(branch_name, &repo.head()?, false)?;
+        Ok(branch)
+    }
+
+
 }
