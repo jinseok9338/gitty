@@ -74,18 +74,14 @@ impl Run<Vec<String>, std::io::Error> for MultiSelect {
 
         let value = match ret {
             Some(value) => value
-            .iter()
-            .map(|i| self.items[*i].clone())
-            .collect::<Vec<String>>(),
+                .iter()
+                .map(|i| self.items[*i].clone())
+                .collect::<Vec<String>>(),
             None => vec![],
         };
 
         // transform the index to the actual value
-        let value = if self.index {
-            value
-        } else {
-            value
-        };
+        let value = if self.index { value } else { value };
         Ok(value)
     }
 }

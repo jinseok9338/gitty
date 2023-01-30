@@ -1,10 +1,13 @@
-use std::path::PathBuf;
+use std::{
+    env,
+    path::{Path, PathBuf},
+};
 
-use git2::{ Error, Remote, Repository};
+use git2::{Cred, Error, Remote, RemoteCallbacks, Repository};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
-     ClientBuilder,
+    ClientBuilder,
 };
 use tokio::spawn;
 
@@ -22,14 +25,37 @@ impl GitHelper {
     }
 
     //for cloining the repository
-    pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> {
+    pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> { 
+        // Prepare callbacks.
+        let mut callbacks = RemoteCallbacks::new();
+        callbacks.credentials(|_url, username_from_url, _allowed_types| {
+            Cred::ssh_key(
+                username_from_url.unwrap(),
+                None,
+                Path::new(&format!("{}/.ssh/id_rsa", env::var("HOME").unwrap())),
+                None,
+            )
+        });
+
+        // Prepare fetch options.
+        let mut fo = git2::FetchOptions::new();
+        fo.remote_callbacks(callbacks);
+
+        // Prepare builder.
+        let mut builder = git2::build::RepoBuilder::new();
+        builder.fetch_options(fo);
+
         // check if the directory is empty
         let repo = if directory.is_dir() {
             // if the directory is not empty then return the error in result enum
             Err(Error::from_str("Directory is not empty"))
         } else {
             // if the directory is empty then clone the repository
-            Repository::clone(url, directory)
+            // Clone the project.
+            builder.clone(
+                "git@github.com:rust-lang/git2-rs.git",
+                Path::new("/tmp/git2-rs"),
+            )
         };
         return repo;
     }
@@ -134,14 +160,4 @@ impl GitHelper {
         remote.connect(git2::Direction::Fetch);
         Ok(())
     }
-
-    pub fn create_local_branch(&self, repo: &Repository, branch_name: &str) -> Result<Branch, Error> {
-        
-        // repo head to repo commit 
-        
-        let branch = repo.branch(branch_name, &repo.head()?, false)?;
-        Ok(branch)
-    }
-
-
 }

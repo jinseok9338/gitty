@@ -1,4 +1,4 @@
-use std::{time, iter::Cycle};
+use std::{iter::Cycle, time};
 
 pub struct Loading {
     message: String,
@@ -9,7 +9,6 @@ pub struct Loading {
 impl Loading {
     // show loading message with dot indicator in terminal
     pub fn spinner(&self) -> Cycle<std::slice::Iter<'_, &str>> {
-    
         self.spinner_chars.iter().cycle()
     }
 

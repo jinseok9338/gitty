@@ -47,7 +47,6 @@ async fn main() {
         std::process::exit(1);
     }
 
-
     if program.directory.is_none() {
         loop {
             let input = Input::default("Enter a directory:", Some(false), None);
@@ -87,7 +86,10 @@ async fn main() {
         let git_work = GitWork::new();
         let directory = program.directory.unwrap().into();
 
-        git_work.gitty_clone_repo(&program.url.unwrap(), &directory).await.unwrap();
+        git_work
+            .gitty_clone_repo(&program.url.unwrap(), &directory)
+            .await
+            .unwrap();
         // pull the selected branches
     }
 }
