@@ -33,7 +33,7 @@ impl GitWork {
 
         loop {
             match remote_branches {
-                Ok(_) => break,
+                Ok(_) => {break},
                 Err(_) => {
                     print!("\r{} ", spinner.spinner().next().unwrap());
                     std::thread::sleep(spinner.spinner_interval);
@@ -51,30 +51,14 @@ impl GitWork {
         let selected_branches = multiselect.run().unwrap();
         println!("You chose: {:?} branches", selected_branches);
 
-        let cloned_repo = self.git_helper.clone_repo(&url, &directory).unwrap();
-        println!("cloned_repo: {:?}", cloned_repo.path());
-
-        // for each branch in selected_branches, create a local branch and pull the remote branch and sync the branches
+        let cloned_repo = self.git_helper.clone_repo(&url, &directory);
+        
+        let cloned_repo = cloned_repo.unwrap();
+        // do a git pull for each branch
         for branch in selected_branches {
-            let local_branch = self
-                .git_helper
-                .create_local_branch(&cloned_repo, &branch)
-                .unwrap();
-            println!("local_branch: {:?}", local_branch.name().unwrap());
-
-            let remote_branch = self
-                .git_helper
-                .remote_branch(&cloned_repo, &branch)
-                .unwrap();
-            println!("remote_branch: {:?}", remote_branch.name().unwrap());
-
-            let sync_branch = self
-                .git_helper
-                .sync_branch(&cloned_repo, &local_branch, &remote_branch)
-                .unwrap();
-            println!("sync_branch: {:?}", sync_branch.name().unwrap());
+           self.git_helper.pull_branch(&cloned_repo, &branch).unwrap();
+            println!("Pulling branch: {}", branch);
         }
-
         Ok(())
     }
 }

@@ -1,9 +1,9 @@
 use std::{
-    env,
-    path::{Path, PathBuf},
+ 
+    path::{ PathBuf},
 };
 
-use git2::{Cred, Error, Remote, RemoteCallbacks, Repository};
+use git2::{ Error, Remote, RemoteCallbacks, Repository, build::RepoBuilder};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
@@ -24,41 +24,41 @@ impl GitHelper {
         Self {}
     }
 
+     pub fn pull_branch(&self,repo:&Repository, branch: &str) -> Result<(), Error> {
+        let mut remote = repo.find_remote("origin")?;
+        let mut fo = git2::FetchOptions::new();
+        let callbacks = RemoteCallbacks::new();
+        fo.remote_callbacks(callbacks);
+        remote.fetch(
+            &[&format!("refs/heads/{}:refs/heads/{}", branch, branch)],
+            Some(&mut fo),
+            None,
+        )?;
+        Ok(())
+    }
+
     //for cloining the repository
     pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> { 
-        // Prepare callbacks.
-        let mut callbacks = RemoteCallbacks::new();
-        callbacks.credentials(|_url, username_from_url, _allowed_types| {
-            Cred::ssh_key(
-                username_from_url.unwrap(),
-                None,
-                Path::new(&format!("{}/.ssh/id_rsa", env::var("HOME").unwrap())),
-                None,
-            )
-        });
+        // if the directory is not empty then return the error in result enum
+        if directory.read_dir().unwrap().count() > 0 {
+            return Err(Error::from_str("Directory is not empty"));
+        }
 
-        // Prepare fetch options.
+        let callbacks = RemoteCallbacks::new();
+        // set credentials callback here, if necessary TODO need cred when cloning a private repo. This is for later implementation
+
+
+        
         let mut fo = git2::FetchOptions::new();
         fo.remote_callbacks(callbacks);
 
-        // Prepare builder.
-        let mut builder = git2::build::RepoBuilder::new();
-        builder.fetch_options(fo);
+        let repo = RepoBuilder::new().fetch_options(fo)
+        .clone(url, directory);
 
-        // check if the directory is empty
-        let repo = if directory.is_dir() {
-            // if the directory is not empty then return the error in result enum
-            Err(Error::from_str("Directory is not empty"))
-        } else {
-            // if the directory is empty then clone the repository
-            // Clone the project.
-            builder.clone(
-                "git@github.com:rust-lang/git2-rs.git",
-                Path::new("/tmp/git2-rs"),
-            )
-        };
-        return repo;
+        repo
     }
+
+    
 
     // fetch all remote branches
     pub fn fetch_all(&self, repo: &Repository) -> Result<(), Error> {
@@ -77,6 +77,10 @@ impl GitHelper {
         )?;
         Ok(())
     }
+
+ 
+
+    
 
     // return all branches in remote repo with the url provided
     pub async fn remote_branches(&self, url: &str) -> ReqwestResult<Vec<String>> {

@@ -1,10 +1,12 @@
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
 
-use std::io::Result;
+use std::{io::Result};
+use core::fmt::Error;
+use super::common_trait::{Default, Run};
 
 /// Prompt that allows the user to select from a list of options
-#[derive(Debug, Parser, Default)]
+#[derive(Debug, Parser)]
 pub struct Select {
     /// Message for the prompt
     #[clap(short, long)]
@@ -30,12 +32,15 @@ pub struct Select {
     items: Vec<String>,
 }
 
-impl Select {
-    pub fn run(&self) -> Result<()> {
+impl Run<String, std::io::Error> for Select {
+     fn run(&self) -> Result<String> {
         let item_len = self.items.len();
 
         if item_len == 0 {
-            return Ok(());
+            // return error
+
+            return Ok("".to_string());
+            
         }
 
         let theme = ColorfulTheme::default();
@@ -64,12 +69,22 @@ impl Select {
             None => std::process::exit(1),
         };
 
-        if self.index {
-            println!("{}", value);
-        } else {
-            println!("{}", self.items[value]);
-        }
+        let result = self.items[value].clone();
 
-        Ok(())
+        Ok(result)
+    }
+}
+
+impl Default for Select {
+    fn default(message: &str, can_be_nullable: Option<bool>, items: Option<Vec<String>>) -> Self {
+        Self {
+            message: message.to_string(),
+            return_default: false,
+           
+            cancel: can_be_nullable.unwrap_or(false),
+            index: false,
+            selected: Some(1),
+            items: items.unwrap_or(vec![]),
+        }
     }
 }
