@@ -34,9 +34,16 @@ enum EnquirerSubcommand {
 
 #[tokio::main]
 async fn main() {
-   
-    let options = vec!["clone the project".to_string(), "sync the existing project with remote repo".to_string(), "sync the existing project and delete the unnecessary branches".to_string()];
-    let select = Select::default("Choose the command you want to execute:", None, Some(options));
+    let options = vec![
+        "clone the project".to_string(),
+        "sync the existing project with remote repo".to_string(),
+        "sync the existing project and delete the unnecessary branches".to_string(),
+    ];
+    let select = Select::default(
+        "Choose the command you want to execute:",
+        None,
+        Some(options),
+    );
     let value = select.run().unwrap();
     println!("You selected: {}", value);
 
@@ -51,8 +58,6 @@ async fn main() {
         println!("Error: --directory must be a valid directory");
         std::process::exit(1);
     }
-
-    
 
     if program.directory.is_none() {
         loop {

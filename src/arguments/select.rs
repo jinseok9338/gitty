@@ -1,9 +1,9 @@
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
 
-use std::{io::Result};
-use core::fmt::Error;
 use super::common_trait::{Default, Run};
+use core::fmt::Error;
+use std::io::Result;
 
 /// Prompt that allows the user to select from a list of options
 #[derive(Debug, Parser)]
@@ -33,14 +33,13 @@ pub struct Select {
 }
 
 impl Run<String, std::io::Error> for Select {
-     fn run(&self) -> Result<String> {
+    fn run(&self) -> Result<String> {
         let item_len = self.items.len();
 
         if item_len == 0 {
             // return error
 
             return Ok("".to_string());
-            
         }
 
         let theme = ColorfulTheme::default();
@@ -80,7 +79,7 @@ impl Default for Select {
         Self {
             message: message.to_string(),
             return_default: false,
-           
+
             cancel: can_be_nullable.unwrap_or(false),
             index: false,
             selected: Some(1),

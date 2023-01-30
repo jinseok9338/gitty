@@ -1,9 +1,6 @@
-use std::{
- 
-    path::{ PathBuf},
-};
+use std::path::PathBuf;
 
-use git2::{ Error, Remote, RemoteCallbacks, Repository, build::RepoBuilder};
+use git2::{build::RepoBuilder, Error, Remote, RemoteCallbacks, Repository};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
@@ -24,7 +21,7 @@ impl GitHelper {
         Self {}
     }
 
-     pub fn pull_branch(&self,repo:&Repository, branch: &str) -> Result<(), Error> {
+    pub fn pull_branch(&self, repo: &Repository, branch: &str) -> Result<(), Error> {
         let mut remote = repo.find_remote("origin")?;
         let mut fo = git2::FetchOptions::new();
         let callbacks = RemoteCallbacks::new();
@@ -38,7 +35,7 @@ impl GitHelper {
     }
 
     //for cloining the repository
-    pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> { 
+    pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> {
         // if the directory is not empty then return the error in result enum
         if directory.read_dir().unwrap().count() > 0 {
             return Err(Error::from_str("Directory is not empty"));
@@ -47,18 +44,13 @@ impl GitHelper {
         let callbacks = RemoteCallbacks::new();
         // set credentials callback here, if necessary TODO need cred when cloning a private repo. This is for later implementation
 
-
-        
         let mut fo = git2::FetchOptions::new();
         fo.remote_callbacks(callbacks);
 
-        let repo = RepoBuilder::new().fetch_options(fo)
-        .clone(url, directory);
+        let repo = RepoBuilder::new().fetch_options(fo).clone(url, directory);
 
         repo
     }
-
-    
 
     // fetch all remote branches
     pub fn fetch_all(&self, repo: &Repository) -> Result<(), Error> {
@@ -77,10 +69,6 @@ impl GitHelper {
         )?;
         Ok(())
     }
-
- 
-
-    
 
     // return all branches in remote repo with the url provided
     pub async fn remote_branches(&self, url: &str) -> ReqwestResult<Vec<String>> {

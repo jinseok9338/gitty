@@ -33,7 +33,7 @@ impl GitWork {
 
         loop {
             match remote_branches {
-                Ok(_) => {break},
+                Ok(_) => break,
                 Err(_) => {
                     print!("\r{} ", spinner.spinner().next().unwrap());
                     std::thread::sleep(spinner.spinner_interval);
@@ -52,11 +52,11 @@ impl GitWork {
         println!("You chose: {:?} branches", selected_branches);
 
         let cloned_repo = self.git_helper.clone_repo(&url, &directory);
-        
+
         let cloned_repo = cloned_repo.unwrap();
         // do a git pull for each branch
         for branch in selected_branches {
-           self.git_helper.pull_branch(&cloned_repo, &branch).unwrap();
+            self.git_helper.pull_branch(&cloned_repo, &branch).unwrap();
             println!("Pulling branch: {}", branch);
         }
         Ok(())
