@@ -12,7 +12,7 @@ use arguments::{
     confirm::Confirm, input::Input, multiselect::MultiSelect, secret::Secret, select::Select,
 };
 use clap::Parser;
-use gits::git_work::GitWork;
+use gits::{behavior::UserInput, git_work::GitWork};
 use tokio::{self};
 
 use crate::{
@@ -20,6 +20,7 @@ use crate::{
         common_trait::{Default, Run},
         enquirer::Enquirer,
     },
+    consts::OPTION_MESSAGES,
     gits::git_helper::GitHelper,
 };
 
@@ -34,74 +35,23 @@ enum EnquirerSubcommand {
 
 #[tokio::main]
 async fn main() {
-    let options = vec![
-        "clone the project".to_string(),
-        "sync the existing project with remote repo".to_string(),
-        "sync the existing project and delete the unnecessary branches".to_string(),
-    ];
     let select = Select::default(
         "Choose the command you want to execute:",
         None,
-        Some(options),
+        Some(OPTION_MESSAGES.iter().map(|&s| s.to_string()).collect()),
     );
-    let value = select.run().unwrap();
-    println!("You selected: {}", value);
 
-    let mut program = Enquirer::parse();
-    // //if program.url is not None and is not a valid url, then error
-    if program.url.is_some() && !program.validate_url() {
-        println!("Error: --url must be a valid url");
-        std::process::exit(1);
-    }
-    //if program.directory is not None and is not a valid directory, then error
-    if program.directory.is_some() && !program.validate_directory() {
-        println!("Error: --directory must be a valid directory");
-        std::process::exit(1);
-    }
+    let behavior = select.run().unwrap();
 
-    if program.directory.is_none() {
-        loop {
-            let input = Input::default("Enter a directory:", Some(false), None);
-            let value = input.run().unwrap();
-            program.directory = Some(value);
-            //if the value is not a valid directory, then error
-            if !program.validate_directory() {
-                println!("Error: --directory must be a valid directory");
-            } else {
-                break;
-            }
-        }
-    }
+    let behavior = match behavior.as_str() {
+        "clone the project" => UserInput::Clone,
+        "sync the existing project with remote repo" => UserInput::Sync,
+        "sync the existing project and delete the unnecessary branches" => UserInput::SyncAndDelete,
+        _ => panic!("Unexpected variant"),
+    };
 
-    if program.url.is_none() {
-        loop {
-            let input = Input::default("Enter a url:", Some(true), None);
-            let value = input.run().unwrap();
-            //if the value is not empty, then set it
-            if !value.is_empty() {
-                program.url = Some(value);
-            }
-            if !program.validate_url() {
-                println!("Error: --url must be a valid url");
-            }
-            //but if the value is none on purpose break the loop
-            else {
-                break;
-            }
-        }
-    }
+    println!("You selected: {:?}", behavior);
 
-    // do gitty work.
-
-    // if the url is provided then check the repo related to the url and check the branches
-    if program.url.is_some() {
-        let git_work = GitWork::new();
-        let directory = program.directory.unwrap().into();
-
-        git_work
-            .gitty_clone_repo(&program.url.unwrap(), &directory)
-            .await
-            .unwrap();
-        // pull the selected branches
-    }
+    let git_work = GitWork::new(behavior);
+    git_work.run();
 }

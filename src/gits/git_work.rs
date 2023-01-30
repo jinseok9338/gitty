@@ -1,45 +1,39 @@
-use std::{error::Error, path::PathBuf};
+use std::error::Error;
 
-use crate::{
-    arguments::{
-        common_trait::{Default, Run},
-        multiselect::MultiSelect,
-    },
-    logs::loading::Loading,
+use crate::arguments::{
+    common_trait::{Default, Run},
+    multiselect::MultiSelect,
 };
 
-use super::git_helper::GitHelper;
+use super::{behavior::UserInput, git_helper::GitHelper};
 
 pub struct GitWork {
     git_helper: GitHelper,
+    input: UserInput,
 }
 
 impl GitWork {
-    pub fn new() -> Self {
+    pub fn new(input: UserInput) -> Self {
         Self {
             git_helper: GitHelper::new(),
+            input,
+        }
+    }
+
+    pub async fn run(&self) {
+        match self.input {
+            UserInput::Clone => self.gitty_clone_repo().await.unwrap(),
+            UserInput::Sync => self.gitty_sync().unwrap(),
+            UserInput::SyncAndDelete => self.gitty_sync_and_delete().unwrap(),
+            _ => panic!("Unexpected variant"),
         }
     }
 
     // gitty up accept url and directory as arguments and clone the repository and all remote branches to local branches
-    pub async fn gitty_clone_repo(
-        &self,
-        url: &str,
-        directory: &PathBuf,
-    ) -> Result<(), Box<dyn Error>> {
-        let spinner = Loading::new("Waiting for remote branches".to_string());
+    async fn gitty_clone_repo(&self) -> Result<(), Box<dyn Error>> {
         // wait for remote branches
         let remote_branches = self.git_helper.remote_branches(&url).await;
 
-        loop {
-            match remote_branches {
-                Ok(_) => break,
-                Err(_) => {
-                    print!("\r{} ", spinner.spinner().next().unwrap());
-                    std::thread::sleep(spinner.spinner_interval);
-                }
-            }
-        }
         let remote_branches = remote_branches.unwrap();
 
         // spawn multiselect with message choose the branches to pull
@@ -60,5 +54,13 @@ impl GitWork {
             println!("Pulling branch: {}", branch);
         }
         Ok(())
+    }
+
+    fn gitty_sync(&self) -> Result<(), Box<dyn Error>> {
+        todo!("sync the existing project with remote repo")
+    }
+
+    fn gitty_sync_and_delete(&self) -> Result<(), Box<dyn Error>> {
+        todo!("sync the existing project and delete the unnecessary branches")
     }
 }
