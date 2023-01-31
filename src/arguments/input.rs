@@ -1,5 +1,8 @@
+use std::error::Error;
+
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
+use reqwest::Url;
 
 use super::common_trait::{Default, Run};
 

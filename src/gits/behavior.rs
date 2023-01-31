@@ -4,7 +4,7 @@ use super::git_work::GitWork;
 
 #[derive(Debug)]
 pub enum UserInput {
-    Clone,
-    Sync,
-    SyncAndDelete,
+    Clone(String),
+    Sync(String),
+    SyncAndDelete(String),
 }

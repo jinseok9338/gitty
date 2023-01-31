@@ -1,9 +1,10 @@
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
+use reqwest::Url;
 
 use super::common_trait::{Default, Run};
-use core::fmt::Error;
-use std::io::Result;
+
+use std::error::Error;
 
 /// Prompt that allows the user to select from a list of options
 #[derive(Debug, Parser)]
@@ -32,14 +33,14 @@ pub struct Select {
     items: Vec<String>,
 }
 
-impl Run<String, std::io::Error> for Select {
-    fn run(&self) -> Result<String> {
+impl Run<String, Box<dyn Error>> for Select {
+    fn run(&self) -> Result<String, Box<dyn Error>> {
         let item_len = self.items.len();
 
         if item_len == 0 {
             // return error
 
-            return Ok("".to_string());
+            return Err("No items to select from".into());
         }
 
         let theme = ColorfulTheme::default();

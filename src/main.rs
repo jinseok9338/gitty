@@ -6,8 +6,6 @@ mod logs;
 
 extern crate termion;
 
-use std::path::PathBuf;
-
 use arguments::{
     confirm::Confirm, input::Input, multiselect::MultiSelect, secret::Secret, select::Select,
 };
@@ -16,12 +14,8 @@ use gits::{behavior::UserInput, git_work::GitWork};
 use tokio::{self};
 
 use crate::{
-    arguments::{
-        common_trait::{Default, Run},
-        enquirer::Enquirer,
-    },
-    consts::OPTION_MESSAGES,
-    gits::git_helper::GitHelper,
+    arguments::common_trait::{Default, Run},
+    consts::{CHOOSE_COMMAND, OPTION_MESSAGES, WELCOME_MESSAGE},
 };
 
 #[derive(Debug, Parser)]
@@ -35,8 +29,9 @@ enum EnquirerSubcommand {
 
 #[tokio::main]
 async fn main() {
+    println!("{}", WELCOME_MESSAGE);
     let select = Select::default(
-        "Choose the command you want to execute:",
+        CHOOSE_COMMAND,
         None,
         Some(OPTION_MESSAGES.iter().map(|&s| s.to_string()).collect()),
     );
@@ -44,14 +39,22 @@ async fn main() {
     let behavior = select.run().unwrap();
 
     let behavior = match behavior.as_str() {
-        "clone the project" => UserInput::Clone,
-        "sync the existing project with remote repo" => UserInput::Sync,
-        "sync the existing project and delete the unnecessary branches" => UserInput::SyncAndDelete,
+        "clone the project" => UserInput::Clone("clone the project".to_string()),
+        "sync the existing project with remote repo" => {
+            UserInput::Sync("sync the existing project with remote repo".to_string())
+        }
+        "sync the existing project and delete the unnecessary branches" => {
+            UserInput::SyncAndDelete(
+                "sync the existing project and delete the unnecessary branches".to_string(),
+            )
+        }
         _ => panic!("Unexpected variant"),
     };
 
     println!("You selected: {:?}", behavior);
 
-    let git_work = GitWork::new(behavior);
-    git_work.run();
+    // this needs url and directory as arguments
+
+    let mut git_work = GitWork::new(behavior);
+    git_work.run().await
 }

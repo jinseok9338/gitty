@@ -52,6 +52,10 @@ impl GitHelper {
         repo
     }
 
+    pub fn repo(&self, directory: &PathBuf) -> Result<Repository, Error> {
+        Repository::open(directory)
+    }
+
     // fetch all remote branches
     pub fn fetch_all(&self, repo: &Repository) -> Result<(), Error> {
         let mut remote = repo.find_remote("origin")?;
@@ -103,11 +107,11 @@ impl GitHelper {
     }
 
     // return all branches in remote repository
-    pub fn remote<'a>(&'a self, repo: &'a Repository) -> Result<Box<Remote>, Error> {
+    pub fn remote<'a>(&'a self, repo: &'a Repository) -> Result<Remote, Error> {
         let remote = repo.find_remote("origin");
         let remote = remote.unwrap();
         let remote = Box::new(remote);
-        Ok(remote)
+        Ok(*remote)
     }
 
     //list all remote branes in remote repo
