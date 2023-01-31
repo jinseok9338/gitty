@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 use git2::{build::RepoBuilder, BranchType, Error, Remote, RemoteCallbacks, Repository};
 
@@ -42,7 +42,7 @@ impl GitHelper {
     }
 
     //for cloining the repository
-    pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> {
+    pub fn clone_repo(&self, url: &str, directory: &Path) -> Result<Repository, Error> {
         // if the directory is not empty then return the error in result enum
         if directory.read_dir().unwrap().count() > 0 {
             return Err(Error::from_str("Directory is not empty"));
@@ -126,7 +126,7 @@ impl GitHelper {
     // list remote branches that are not in local repository
     pub fn _list_differece_branches(
         &self,
-        local_branches: &Vec<String>,
+        local_branches: &[String],
         remote_branches: &Vec<String>,
     ) -> Vec<String> {
         let mut difference_branches = Vec::new();

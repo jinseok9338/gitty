@@ -83,7 +83,7 @@ impl Default for Select {
             cancel: can_be_nullable.unwrap_or(false),
             index: false,
             selected: Some(1),
-            items: items.unwrap_or(vec![]),
+            items: items.unwrap_or_default(),
         }
     }
 }

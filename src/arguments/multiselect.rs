@@ -80,8 +80,7 @@ impl Run<Vec<String>, std::io::Error> for MultiSelect {
             None => vec![],
         };
 
-        // transform the index to the actual value
-        let value = if self.index { value } else { value };
+       
         Ok(value)
     }
 }
@@ -95,7 +94,7 @@ impl Default for MultiSelect {
             cancel: can_be_nullable.unwrap_or(false),
             index: false,
             selected: vec![],
-            items: items.unwrap_or(vec![]),
+            items: items.unwrap_or_default(),
         }
     }
 }
