@@ -1,4 +1,4 @@
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 use git2::{build::RepoBuilder, BranchType, Error, Remote, RemoteCallbacks, Repository};
 

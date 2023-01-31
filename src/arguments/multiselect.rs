@@ -80,7 +80,6 @@ impl Run<Vec<String>, std::io::Error> for MultiSelect {
             None => vec![],
         };
 
-       
         Ok(value)
     }
 }
