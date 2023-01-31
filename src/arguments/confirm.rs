@@ -24,7 +24,7 @@ pub struct Confirm {
 }
 
 impl Confirm {
-    pub fn run(&self) -> Result<()> {
+    pub fn _run(&self) -> Result<()> {
         let theme = ColorfulTheme::default();
         let mut input = dialoguer::Confirm::with_theme(&theme);
 

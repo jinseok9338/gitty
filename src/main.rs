@@ -1,8 +1,6 @@
-mod app;
 mod arguments;
 mod consts;
 mod gits;
-mod logs;
 
 extern crate termion;
 
@@ -39,13 +37,14 @@ async fn main() {
     let behavior = select.run().unwrap();
 
     let behavior = match behavior.as_str() {
-        "clone the project" => UserInput::Clone("clone the project".to_string()),
+        "clone the project" => UserInput::Clone(OPTION_MESSAGES[0].to_string()),
         "sync the existing project with remote repo" => {
-            UserInput::Sync("sync the existing project with remote repo".to_string())
+            UserInput::Sync(OPTION_MESSAGES[1].to_string())
         }
-        "sync the existing project and delete the unnecessary branches" => {
-            UserInput::SyncAndDelete(
-                "sync the existing project and delete the unnecessary branches".to_string(),
+        "Delete unnecessary branches" => {
+            UserInput::Purge(
+                //choose the index of 2 of CHOOSE_COMMAND
+                OPTION_MESSAGES[2].to_string(),
             )
         }
         _ => panic!("Unexpected variant"),

@@ -8,7 +8,7 @@ use crate::{
         input::Input,
         multiselect::MultiSelect,
     },
-    consts::CHOOSE_BRANCHES,
+    consts::{CHOOSE_BRANCHES, CHOOSE_DELETE_BRANCHES},
 };
 
 use super::{behavior::UserInput, git_helper::GitHelper};
@@ -34,7 +34,7 @@ impl GitWork {
         match self.input {
             UserInput::Clone(_) => self.gitty_clone_repo().await.unwrap(),
             UserInput::Sync(_) => self.gitty_sync().unwrap(),
-            UserInput::SyncAndDelete(_) => self.gitty_sync_and_delete().unwrap(),
+            UserInput::Purge(_) => self.purge_branches().unwrap(),
         }
     }
 
@@ -136,7 +136,38 @@ impl GitWork {
         Ok(())
     }
 
-    fn gitty_sync_and_delete(&self) -> Result<(), Box<dyn Error>> {
-        todo!("sync the existing project and delete the unnecessary branches")
+    fn purge_branches(&mut self) -> Result<(), Box<dyn Error>> {
+        loop {
+            let directory = Input::default("Enter the directory:", None, None)
+                .run()
+                .unwrap();
+            // if the url is valid then break the loop with match
+            match PathBuf::from(&directory).exists() {
+                true => {
+                    self.directory = Some(PathBuf::from(&directory));
+                    break;
+                }
+                false => continue,
+            }
+        }
+        // with the directory get the repository
+        let repo = self
+            .git_helper
+            .repo(&self.directory.clone().unwrap())
+            .unwrap();
+        // get the local  branches as list
+        let local_branches = self.git_helper.list_local_branches(&repo).unwrap();
+        // spawn multiselect with message choose the branches to pull
+        let multiselect =
+            MultiSelect::default(CHOOSE_DELETE_BRANCHES, Some(false), Some(local_branches))
+                .run()
+                .unwrap();
+
+        // delete the branches
+        for branch in multiselect {
+            self.git_helper.delete_branch(&repo, &branch).unwrap();
+            println!("Deleting branch: {:?}", branch);
+        }
+        Ok(())
     }
 }

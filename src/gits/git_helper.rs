@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use git2::{build::RepoBuilder, Error, Remote, RemoteCallbacks, Repository};
+use git2::{build::RepoBuilder, BranchType, Error, Remote, RemoteCallbacks, Repository};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
@@ -34,6 +34,13 @@ impl GitHelper {
         Ok(())
     }
 
+    pub fn delete_branch(&self, repo: &Repository, branch_name: &str) -> Result<(), Error> {
+        let mut branch = repo.find_branch(branch_name, BranchType::Local)?;
+        branch.delete()?;
+
+        Ok(())
+    }
+
     //for cloining the repository
     pub fn clone_repo(&self, url: &str, directory: &PathBuf) -> Result<Repository, Error> {
         // if the directory is not empty then return the error in result enum
@@ -54,24 +61,6 @@ impl GitHelper {
 
     pub fn repo(&self, directory: &PathBuf) -> Result<Repository, Error> {
         Repository::open(directory)
-    }
-
-    // fetch all remote branches
-    pub fn fetch_all(&self, repo: &Repository) -> Result<(), Error> {
-        let mut remote = repo.find_remote("origin")?;
-        remote.fetch(&["refs/heads/*:refs/heads/*"], None, None)?;
-        Ok(())
-    }
-
-    // fetch a specific remote branch
-    pub fn fetch_branch(&self, repo: &Repository, branch: &str) -> Result<(), Error> {
-        let mut remote = repo.find_remote("origin")?;
-        remote.fetch(
-            &[&format!("refs/heads/{}:refs/heads/{}", branch, branch)],
-            None,
-            None,
-        )?;
-        Ok(())
     }
 
     // return all branches in remote repo with the url provided
@@ -135,7 +124,7 @@ impl GitHelper {
     }
 
     // list remote branches that are not in local repository
-    pub fn list_differece_branches(
+    pub fn _list_differece_branches(
         &self,
         local_branches: &Vec<String>,
         remote_branches: &Vec<String>,
@@ -147,13 +136,5 @@ impl GitHelper {
             }
         }
         difference_branches
-    }
-
-    pub fn add_remote_for_fetch(&self, repo: &Repository, url: &str) -> Result<(), Error> {
-        let remote_name = "origin";
-        let mut remote = repo.remote(remote_name, url)?;
-        // fetch from remote
-        remote.connect(git2::Direction::Fetch);
-        Ok(())
     }
 }

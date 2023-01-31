@@ -24,7 +24,7 @@ pub struct Secret {
 }
 
 impl Secret {
-    pub fn run(&self) -> Result<()> {
+    pub fn _run(&self) -> Result<()> {
         let theme = ColorfulTheme::default();
         let mut input = dialoguer::Password::with_theme(&theme);
 

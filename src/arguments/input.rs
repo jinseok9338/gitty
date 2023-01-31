@@ -1,8 +1,5 @@
-use std::error::Error;
-
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
-use reqwest::Url;
 
 use super::common_trait::{Default, Run};
 
@@ -44,7 +41,7 @@ impl Run<String, Box<dyn std::error::Error>> for Input {
 }
 
 impl Default for Input {
-    fn default(message: &str, can_be_nullable: Option<bool>, items: Option<Vec<String>>) -> Self {
+    fn default(message: &str, can_be_nullable: Option<bool>, _items: Option<Vec<String>>) -> Self {
         Self {
             message: message.to_string(),
             default: None,

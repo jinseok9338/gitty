@@ -1,7 +1,7 @@
 use super::common_trait::{Default, Run};
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
-use std::{error::Error, io::Result, iter::repeat};
+use std::{io::Result, iter::repeat};
 
 /// Prompt that allows the user to select multiple items from a list of options
 #[derive(Debug, Parser)]
