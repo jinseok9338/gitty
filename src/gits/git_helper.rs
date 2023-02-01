@@ -43,18 +43,18 @@ impl GitHelper {
 
     //for cloining the repository
     pub fn clone_repo(&self, url: &str, directory: &Path) -> Result<Repository, Error> {
-        // if the directory is not empty then return the error in result enum
-        if directory.read_dir().unwrap().count() > 0 {
-            return Err(Error::from_str("Directory is not empty"));
-        }
-
+        //get project name from url https://github.com/jinseok9338/gitty.git -> gitty
+        let project_name = url.split("/").last().unwrap().split(".").next().unwrap();
+        // add the project name to the directory with /
+        let directory = directory.join(project_name);
+        
         let callbacks = RemoteCallbacks::new();
         // set credentials callback here, if necessary TODO need cred when cloning a private repo. This is for later implementation
 
         let mut fo = git2::FetchOptions::new();
         fo.remote_callbacks(callbacks);
 
-        let repo = RepoBuilder::new().fetch_options(fo).clone(url, directory);
+        let repo = RepoBuilder::new().fetch_options(fo).clone(url, &directory);
 
         repo
     }
