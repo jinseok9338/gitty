@@ -107,7 +107,8 @@ impl GitHelper {
     }
 
     pub fn list_local_branches(repo: &Repository) -> Result<Vec<String>, Error> {
-        let branches = repo.branches(None)?;
+        // list only local branches that doesn't contain remote branches
+        let branches = repo.branches(Some(BranchType::Local))?;
         let local_branches = branches
             .map(|branch| branch.unwrap().0.name().unwrap().unwrap().to_string())
             .collect();
