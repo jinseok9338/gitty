@@ -47,7 +47,7 @@ impl GitHelper {
         let project_name = url.split("/").last().unwrap().split(".").next().unwrap();
         // add the project name to the directory with /
         let directory = directory.join(project_name);
-        
+
         let callbacks = RemoteCallbacks::new();
         // set credentials callback here, if necessary TODO need cred when cloning a private repo. This is for later implementation
 

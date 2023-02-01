@@ -78,9 +78,12 @@ impl GitWork {
 
         let remote_branches = remote_branches.unwrap();
 
-
         // spawn multiselect with message choose the branches to pull
-        let multiselect = MultiSelect::default(&(CHOOSE_BRANCHES.to_owned() + DEFAULT_BRANCH), Some(false), Some(remote_branches));
+        let multiselect = MultiSelect::default(
+            &(CHOOSE_BRANCHES.to_owned() + DEFAULT_BRANCH),
+            Some(false),
+            Some(remote_branches),
+        );
         let selected_branches = multiselect.run().unwrap();
         println!("You chose: {selected_branches:?} branches");
 

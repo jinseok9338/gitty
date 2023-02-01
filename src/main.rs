@@ -7,6 +7,8 @@ extern crate termion;
 use arguments::{
     confirm::Confirm, input::Input, multiselect::MultiSelect, secret::Secret, select::Select,
 };
+use color_eyre::eyre::Result;
+
 use clap::Parser;
 use gits::{behavior::UserInput, git_work::GitWork};
 use tokio::{self};
@@ -26,7 +28,8 @@ enum EnquirerSubcommand {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
+    color_eyre::install()?;
     println!("{WELCOME_MESSAGE}");
     let select = Select::default(
         CHOOSE_COMMAND,
@@ -55,5 +58,6 @@ async fn main() {
     // this needs url and directory as arguments
 
     let mut git_work = GitWork::new(behavior);
-    git_work.run().await
+    git_work.run().await;
+    Ok(())
 }
