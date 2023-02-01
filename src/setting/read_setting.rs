@@ -8,7 +8,7 @@ pub struct Settings {
 impl Settings {
     pub fn new() -> Self {
         let contents = std::fs::read_to_string("./gitty_config.yml").expect("Unable to read file");
-        let settings: Settings = serde_yaml::from_str(&contents).expect("Unable to parse YAML");
+        let settings: Self = serde_yaml::from_str(&contents).expect("Unable to parse YAML");
         settings
     }
 }

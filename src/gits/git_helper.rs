@@ -1,7 +1,4 @@
-use std::{
-    f32::consts::E,
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 
 use git2::{build::RepoBuilder, BranchType, Error, Remote, RemoteCallbacks, Repository};
 
