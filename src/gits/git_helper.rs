@@ -41,7 +41,7 @@ impl GitHelper {
     }
 
     pub fn clone_repo(&self, url: &str, directory: &Path) -> Result<Repository, Error> {
-        let project_name = url.split("/").last().unwrap().split(".").next().unwrap();
+        let project_name = url.split('/').last().unwrap().split('.').next().unwrap();
 
         let directory = directory.join(project_name);
 
