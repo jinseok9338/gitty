@@ -8,6 +8,8 @@ use reqwest::{
 };
 use tokio::spawn;
 
+use crate::consts::PROPER_URL_WARNING;
+
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
 
@@ -39,7 +41,7 @@ impl GitHelper {
         Ok(())
     }
 
-    pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, Error> {
+    pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, git2::Error> {
         let project_name = url.split('/').last().unwrap().split('.').next().unwrap();
 
         let directory = directory.join(project_name);
@@ -59,9 +61,9 @@ impl GitHelper {
     }
 
     pub async fn remote_branches(&self, url: &str) -> ReqwestResult<Vec<String>> {
-        let start = url.find(".com/").unwrap() + 5;
+        let start = url.find(".com/").expect(PROPER_URL_WARNING) + 5;
 
-        let end = url.find(".git").unwrap();
+        let end = url.find(".git").expect(PROPER_URL_WARNING);
 
         let repo_url = &url[start..end];
 

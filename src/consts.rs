@@ -8,3 +8,4 @@ pub const OPTION_MESSAGES: &[&str] = &[
 pub const CHOOSE_BRANCHES: &str = "Choose the branches to pull:";
 pub const DEFAULT_BRANCH: &str = "default branch will be pulled automatically";
 pub const CHOOSE_DELETE_BRANCHES: &str = "Choose the branches to delete:";
+pub const PROPER_URL_WARNING: &str = "Please enter a proper URL";

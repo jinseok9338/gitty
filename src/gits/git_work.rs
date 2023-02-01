@@ -69,7 +69,12 @@ impl GitWork {
             .remote_branches(&self.url.clone().unwrap())
             .await;
 
-        let remote_branches = remote_branches.unwrap();
+        let remote_branches = match remote_branches {
+            Ok(branches) => branches,
+            Err(err) => {
+                panic!("{}", err)
+            }
+        };
 
         let multiselect = MultiSelect::default(
             &(CHOOSE_BRANCHES.to_owned() + DEFAULT_BRANCH),
@@ -82,11 +87,25 @@ impl GitWork {
         let cloned_repo =
             GitHelper::clone_repo(&self.url.clone().unwrap(), &self.directory.clone().unwrap());
 
-        let cloned_repo = cloned_repo.unwrap();
+        //
+        let cloned_repo = match cloned_repo {
+            Ok(repo) => repo,
+            // have different error behavior for different errors
+            Err(err) => {
+                match err.code() {
+                    git2::ErrorCode::GenericError => panic!("This is generic Error"),
+                    git2::ErrorCode::NotFound =>  panic!("The cloned repo not found"),
+                    git2::ErrorCode::Exists => panic!("The repo already exists and is not an empty directory choose different directory to clone your project"),
+                    _ => panic!("Unexpected error: {err:?}"),
+                }
+            },
+        };
 
         for branch in selected_branches {
-            GitHelper::pull_branch(&cloned_repo, &branch).unwrap();
-            println!("Pulling branch: {branch:?}");
+            match GitHelper::pull_branch(&cloned_repo, &branch) {
+                Ok(_) => println!("Pulling branch: {branch:?}"),
+                Err(err) => panic!("Unable to pull branch: {err:?}"),
+            };
         }
         Ok(())
     }
