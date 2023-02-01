@@ -8,7 +8,7 @@ use crate::{
         input::Input,
         multiselect::MultiSelect,
     },
-    consts::{CHOOSE_BRANCHES, CHOOSE_DELETE_BRANCHES},
+    consts::{CHOOSE_BRANCHES, CHOOSE_DELETE_BRANCHES, DEFAULT_BRANCH},
 };
 
 use super::{behavior::UserInput, git_helper::GitHelper};
@@ -21,7 +21,7 @@ pub struct GitWork {
 }
 
 impl GitWork {
-    pub fn new(input: UserInput) -> Self {
+    pub const fn new(input: UserInput) -> Self {
         Self {
             git_helper: GitHelper::new(),
             input,
@@ -33,26 +33,20 @@ impl GitWork {
     pub async fn run(&mut self) {
         match self.input {
             UserInput::Clone(_) => self.gitty_clone_repo().await.unwrap(),
-            UserInput::Sync(_) => self.gitty_sync().unwrap(),
-            UserInput::Purge(_) => self.purge_branches().unwrap(),
+            UserInput::Sync(_) => self.gitty_sync(),
+            UserInput::Purge(_) => self.purge_branches(),
         }
     }
 
-    // gitty up accept url and directory as arguments and clone the repository and all remote branches to local branches
     async fn gitty_clone_repo(&mut self) -> Result<(), Box<dyn Error>> {
-        // get the url
-
         loop {
             let directory = Input::default("Enter the directory:", None, None)
                 .run()
                 .unwrap();
-            // if the url is valid then break the loop with match
-            match PathBuf::from(&directory).exists() {
-                true => {
-                    self.directory = Some(PathBuf::from(&directory));
-                    break;
-                }
-                false => continue,
+
+            if PathBuf::from(&directory).exists() {
+                self.directory = Some(PathBuf::from(&directory));
+                break;
             }
         }
 
@@ -60,7 +54,7 @@ impl GitWork {
             let url = Input::default("Enter the url of the repository:", None, None)
                 .run()
                 .unwrap();
-            // if the url is valid then break the loop
+
             match Url::parse(&url) {
                 Ok(_) => {
                     self.url = Some(url);
@@ -70,7 +64,6 @@ impl GitWork {
             }
         }
 
-        // wait for remote branches
         let remote_branches = self
             .git_helper
             .remote_branches(&self.url.clone().unwrap())
@@ -78,96 +71,78 @@ impl GitWork {
 
         let remote_branches = remote_branches.unwrap();
 
-        // spawn multiselect with message choose the branches to pull
-        let multiselect = MultiSelect::default(CHOOSE_BRANCHES, Some(false), Some(remote_branches));
+        let multiselect = MultiSelect::default(
+            &(CHOOSE_BRANCHES.to_owned() + DEFAULT_BRANCH),
+            Some(false),
+            Some(remote_branches),
+        );
         let selected_branches = multiselect.run().unwrap();
-        println!("You chose: {:?} branches", selected_branches);
+        println!("You chose: {selected_branches:?} branches");
 
-        let cloned_repo = self
-            .git_helper
-            .clone_repo(&self.url.clone().unwrap(), &self.directory.clone().unwrap());
+        let cloned_repo =
+            GitHelper::clone_repo(&self.url.clone().unwrap(), &self.directory.clone().unwrap());
 
         let cloned_repo = cloned_repo.unwrap();
-        // do a git pull for each branch
+
         for branch in selected_branches {
-            self.git_helper.pull_branch(&cloned_repo, &branch).unwrap();
-            println!("Pulling branch: {:?}", branch);
+            GitHelper::pull_branch(&cloned_repo, &branch).unwrap();
+            println!("Pulling branch: {branch:?}");
         }
         Ok(())
     }
 
-    fn gitty_sync(&mut self) -> Result<(), Box<dyn Error>> {
+    fn gitty_sync(&mut self) {
         loop {
             let directory = Input::default("Enter the directory:", None, None)
                 .run()
                 .unwrap();
-            // if the url is valid then break the loop with match
-            match PathBuf::from(&directory).exists() {
-                true => {
-                    self.directory = Some(PathBuf::from(&directory));
-                    break;
-                }
-                false => continue,
+
+            if PathBuf::from(&directory).exists() {
+                self.directory = Some(PathBuf::from(&directory));
+                break;
             }
         }
-        // with the directory get the repository
-        let repo = self
-            .git_helper
-            .repo(&self.directory.clone().unwrap())
-            .unwrap();
-        // get the remote branches
-        let remote_branches = self.git_helper.remote(&repo).unwrap();
-        // get branch lists from the remote
-        let remote_branches = self
-            .git_helper
-            .list_remote_branches(&remote_branches)
-            .unwrap();
 
-        // spawn multiselect with message choose the branches to pull
+        let repo = GitHelper::repo(&self.directory.clone().unwrap()).unwrap();
+
+        let remote_branches = GitHelper::remote(&repo);
+
+        let remote_branches = GitHelper::list_remote_branches(&remote_branches).unwrap();
+
         let multiselect = MultiSelect::default(CHOOSE_BRANCHES, Some(false), Some(remote_branches))
             .run()
             .unwrap();
-        // do a git pull for each branch
-        for branch in multiselect {
-            self.git_helper.pull_branch(&repo, &branch).unwrap();
-            println!("Pulling branch: {:?}", branch);
-        }
 
-        Ok(())
+        for branch in multiselect {
+            GitHelper::pull_branch(&repo, &branch).unwrap();
+            println!("Pulling branch: {branch:?}");
+        }
     }
 
-    fn purge_branches(&mut self) -> Result<(), Box<dyn Error>> {
+    fn purge_branches(&mut self) {
         loop {
             let directory = Input::default("Enter the directory:", None, None)
                 .run()
                 .unwrap();
-            // if the url is valid then break the loop with match
-            match PathBuf::from(&directory).exists() {
-                true => {
-                    self.directory = Some(PathBuf::from(&directory));
-                    break;
-                }
-                false => continue,
+
+            if PathBuf::from(&directory).exists() {
+                self.directory = Some(PathBuf::from(&directory));
+                break;
             }
         }
-        // with the directory get the repository
-        let repo = self
-            .git_helper
-            .repo(&self.directory.clone().unwrap())
-            .unwrap();
-        // get the local  branches as list
-        let local_branches = self.git_helper.list_local_branches(&repo).unwrap();
-        // spawn multiselect with message choose the branches to pull
+
+        let repo = GitHelper::repo(&self.directory.clone().unwrap()).unwrap();
+
+        let local_branches = GitHelper::list_local_branches(&repo).unwrap();
+
         let multiselect =
             MultiSelect::default(CHOOSE_DELETE_BRANCHES, Some(false), Some(local_branches))
                 .run()
                 .unwrap();
 
-        // delete the branches
         for branch in multiselect {
-            self.git_helper.delete_branch(&repo, &branch).unwrap();
-            println!("Deleting branch: {:?}", branch);
+            GitHelper::delete_branch(&repo, &branch).unwrap();
+            println!("Deleting branch: {branch:?}");
         }
-        Ok(())
     }
 }

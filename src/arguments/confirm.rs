@@ -17,10 +17,6 @@ pub struct Confirm {
     /// Sets the default value for the prompt as `true`
     #[clap(short, long)]
     default: bool,
-    // TODO: Validation
-    // #[clap(short, long)]
-    // /// Command to validate the submitted value
-    // validate: Option<String>,
 }
 
 impl Confirm {
@@ -36,10 +32,7 @@ impl Confirm {
             Some(input.interact()?)
         };
 
-        let value = match ret {
-            Some(value) => value,
-            None => std::process::exit(1),
-        };
+        let value = ret.map_or_else(|| std::process::exit(1), |value| value);
 
         if value {
             println!("true");

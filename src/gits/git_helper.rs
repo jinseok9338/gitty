@@ -11,70 +11,61 @@ use tokio::spawn;
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
 
-// impl the debug
-
 #[derive(Debug)]
 pub struct GitHelper {}
 
 impl GitHelper {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {}
     }
 
-    pub fn pull_branch(&self, repo: &Repository, branch: &str) -> Result<(), Error> {
+    pub fn pull_branch(repo: &Repository, branch: &str) -> Result<(), Error> {
         let mut remote = repo.find_remote("origin")?;
         let mut fo = git2::FetchOptions::new();
         let callbacks = RemoteCallbacks::new();
         fo.remote_callbacks(callbacks);
         remote.fetch(
-            &[&format!("refs/heads/{}:refs/heads/{}", branch, branch)],
+            &[&format!("refs/heads/{branch}:refs/heads/{branch}")],
             Some(&mut fo),
             None,
         )?;
         Ok(())
     }
 
-    pub fn delete_branch(&self, repo: &Repository, branch_name: &str) -> Result<(), Error> {
+    pub fn delete_branch(repo: &Repository, branch_name: &str) -> Result<(), Error> {
         let mut branch = repo.find_branch(branch_name, BranchType::Local)?;
         branch.delete()?;
 
         Ok(())
     }
 
-    //for cloining the repository
-    pub fn clone_repo(&self, url: &str, directory: &Path) -> Result<Repository, Error> {
-        // if the directory is not empty then return the error in result enum
-        if directory.read_dir().unwrap().count() > 0 {
-            return Err(Error::from_str("Directory is not empty"));
-        }
+    pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, Error> {
+        let project_name = url.split('/').last().unwrap().split('.').next().unwrap();
+
+        let directory = directory.join(project_name);
 
         let callbacks = RemoteCallbacks::new();
-        // set credentials callback here, if necessary TODO need cred when cloning a private repo. This is for later implementation
 
         let mut fo = git2::FetchOptions::new();
         fo.remote_callbacks(callbacks);
 
-        let repo = RepoBuilder::new().fetch_options(fo).clone(url, directory);
+        let repo = RepoBuilder::new().fetch_options(fo).clone(url, &directory);
 
         repo
     }
 
-    pub fn repo(&self, directory: &PathBuf) -> Result<Repository, Error> {
+    pub fn repo(directory: &PathBuf) -> Result<Repository, Error> {
         Repository::open(directory)
     }
 
-    // return all branches in remote repo with the url provided
     pub async fn remote_branches(&self, url: &str) -> ReqwestResult<Vec<String>> {
-        // only get only jinseok/jinseok from string https://github.com/jinseok9338/jinseok9338.git
-
-        // Find the position of the '/' after '.com'
         let start = url.find(".com/").unwrap() + 5;
-        // Find the position of the '.git
+
         let end = url.find(".git").unwrap();
-        // Extract the substring between the two positions
+
         let repo_url = &url[start..end];
 
-        let repo_url = format!("https://api.github.com/repos/{}/branches", repo_url);
+        let repo_url = format!("https://api.github.com/repos/{repo_url}/branches");
 
         let mut headers = HeaderMap::new();
         headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
@@ -95,16 +86,14 @@ impl GitHelper {
         Ok(branches_names)
     }
 
-    // return all branches in remote repository
-    pub fn remote<'a>(&'a self, repo: &'a Repository) -> Result<Remote, Error> {
+    pub fn remote(repo: &Repository) -> Remote {
         let remote = repo.find_remote("origin");
         let remote = remote.unwrap();
         let remote = Box::new(remote);
-        Ok(*remote)
+        *remote
     }
 
-    //list all remote branes in remote repo
-    pub fn list_remote_branches(&self, remote: &Remote) -> Result<Vec<String>, Error> {
+    pub fn list_remote_branches(remote: &Remote) -> Result<Vec<String>, Error> {
         let branches = remote.list()?;
         let remote_branches = branches
             .iter()
@@ -115,7 +104,7 @@ impl GitHelper {
         Ok(remote_branches)
     }
 
-    pub fn list_local_branches(&self, repo: &Repository) -> Result<Vec<String>, Error> {
+    pub fn list_local_branches(repo: &Repository) -> Result<Vec<String>, Error> {
         let branches = repo.branches(None)?;
         let local_branches = branches
             .map(|branch| branch.unwrap().0.name().unwrap().unwrap().to_string())
@@ -123,9 +112,7 @@ impl GitHelper {
         Ok(local_branches)
     }
 
-    // list remote branches that are not in local repository
     pub fn _list_differece_branches(
-        &self,
         local_branches: &[String],
         remote_branches: &Vec<String>,
     ) -> Vec<String> {
