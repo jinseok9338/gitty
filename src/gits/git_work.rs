@@ -38,15 +38,12 @@ impl GitWork {
         }
     }
 
-    // gitty up accept url and directory as arguments and clone the repository and all remote branches to local branches
     async fn gitty_clone_repo(&mut self) -> Result<(), Box<dyn Error>> {
-        // get the url
-
         loop {
             let directory = Input::default("Enter the directory:", None, None)
                 .run()
                 .unwrap();
-            // if the url is valid then break the loop with match
+
             match PathBuf::from(&directory).exists() {
                 true => {
                     self.directory = Some(PathBuf::from(&directory));
@@ -60,7 +57,7 @@ impl GitWork {
             let url = Input::default("Enter the url of the repository:", None, None)
                 .run()
                 .unwrap();
-            // if the url is valid then break the loop
+
             match Url::parse(&url) {
                 Ok(_) => {
                     self.url = Some(url);
@@ -70,7 +67,6 @@ impl GitWork {
             }
         }
 
-        // wait for remote branches
         let remote_branches = self
             .git_helper
             .remote_branches(&self.url.clone().unwrap())
@@ -78,7 +74,6 @@ impl GitWork {
 
         let remote_branches = remote_branches.unwrap();
 
-        // spawn multiselect with message choose the branches to pull
         let multiselect = MultiSelect::default(
             &(CHOOSE_BRANCHES.to_owned() + DEFAULT_BRANCH),
             Some(false),
@@ -92,7 +87,7 @@ impl GitWork {
             .clone_repo(&self.url.clone().unwrap(), &self.directory.clone().unwrap());
 
         let cloned_repo = cloned_repo.unwrap();
-        // do a git pull for each branch
+
         for branch in selected_branches {
             self.git_helper.pull_branch(&cloned_repo, &branch).unwrap();
             println!("Pulling branch: {branch:?}");
@@ -105,7 +100,7 @@ impl GitWork {
             let directory = Input::default("Enter the directory:", None, None)
                 .run()
                 .unwrap();
-            // if the url is valid then break the loop with match
+
             match PathBuf::from(&directory).exists() {
                 true => {
                     self.directory = Some(PathBuf::from(&directory));
@@ -114,24 +109,23 @@ impl GitWork {
                 false => continue,
             }
         }
-        // with the directory get the repository
+
         let repo = self
             .git_helper
             .repo(&self.directory.clone().unwrap())
             .unwrap();
-        // get the remote branches
+
         let remote_branches = self.git_helper.remote(&repo).unwrap();
-        // get branch lists from the remote
+
         let remote_branches = self
             .git_helper
             .list_remote_branches(&remote_branches)
             .unwrap();
 
-        // spawn multiselect with message choose the branches to pull
         let multiselect = MultiSelect::default(CHOOSE_BRANCHES, Some(false), Some(remote_branches))
             .run()
             .unwrap();
-        // do a git pull for each branch
+
         for branch in multiselect {
             self.git_helper.pull_branch(&repo, &branch).unwrap();
             println!("Pulling branch: {branch:?}");
@@ -145,7 +139,7 @@ impl GitWork {
             let directory = Input::default("Enter the directory:", None, None)
                 .run()
                 .unwrap();
-            // if the url is valid then break the loop with match
+
             match PathBuf::from(&directory).exists() {
                 true => {
                     self.directory = Some(PathBuf::from(&directory));
@@ -154,20 +148,19 @@ impl GitWork {
                 false => continue,
             }
         }
-        // with the directory get the repository
+
         let repo = self
             .git_helper
             .repo(&self.directory.clone().unwrap())
             .unwrap();
-        // get the local  branches as list
+
         let local_branches = self.git_helper.list_local_branches(&repo).unwrap();
-        // spawn multiselect with message choose the branches to pull
+
         let multiselect =
             MultiSelect::default(CHOOSE_DELETE_BRANCHES, Some(false), Some(local_branches))
                 .run()
                 .unwrap();
 
-        // delete the branches
         for branch in multiselect {
             self.git_helper.delete_branch(&repo, &branch).unwrap();
             println!("Deleting branch: {branch:?}");

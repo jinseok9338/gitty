@@ -11,7 +11,6 @@ use tokio::spawn;
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
 
-// impl the debug
 
 #[derive(Debug)]
 pub struct GitHelper {}
@@ -41,15 +40,12 @@ impl GitHelper {
         Ok(())
     }
 
-    //for cloining the repository
     pub fn clone_repo(&self, url: &str, directory: &Path) -> Result<Repository, Error> {
-        //get project name from url https://github.com/jinseok9338/gitty.git -> gitty
         let project_name = url.split("/").last().unwrap().split(".").next().unwrap();
-        // add the project name to the directory with /
+
         let directory = directory.join(project_name);
 
         let callbacks = RemoteCallbacks::new();
-        // set credentials callback here, if necessary TODO need cred when cloning a private repo. This is for later implementation
 
         let mut fo = git2::FetchOptions::new();
         fo.remote_callbacks(callbacks);
@@ -63,15 +59,11 @@ impl GitHelper {
         Repository::open(directory)
     }
 
-    // return all branches in remote repo with the url provided
     pub async fn remote_branches(&self, url: &str) -> ReqwestResult<Vec<String>> {
-        // only get only jinseok/jinseok from string https://github.com/jinseok9338/jinseok9338.git
-
-        // Find the position of the '/' after '.com'
         let start = url.find(".com/").unwrap() + 5;
-        // Find the position of the '.git
+
         let end = url.find(".git").unwrap();
-        // Extract the substring between the two positions
+
         let repo_url = &url[start..end];
 
         let repo_url = format!("https://api.github.com/repos/{repo_url}/branches");
@@ -95,7 +87,6 @@ impl GitHelper {
         Ok(branches_names)
     }
 
-    // return all branches in remote repository
     pub fn remote<'a>(&'a self, repo: &'a Repository) -> Result<Remote, Error> {
         let remote = repo.find_remote("origin");
         let remote = remote.unwrap();
@@ -103,7 +94,6 @@ impl GitHelper {
         Ok(*remote)
     }
 
-    //list all remote branes in remote repo
     pub fn list_remote_branches(&self, remote: &Remote) -> Result<Vec<String>, Error> {
         let branches = remote.list()?;
         let remote_branches = branches
@@ -123,7 +113,6 @@ impl GitHelper {
         Ok(local_branches)
     }
 
-    // list remote branches that are not in local repository
     pub fn _list_differece_branches(
         &self,
         local_branches: &[String],

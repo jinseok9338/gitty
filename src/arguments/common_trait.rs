@@ -1,4 +1,4 @@
-// this is the trait that gets implemented throughout the arguments module
+
 
 pub trait Run<T, E> {
     fn run(&self) -> Result<T, E>;

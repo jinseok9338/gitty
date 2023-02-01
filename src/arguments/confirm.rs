@@ -17,10 +17,7 @@ pub struct Confirm {
     /// Sets the default value for the prompt as `true`
     #[clap(short, long)]
     default: bool,
-    // TODO: Validation
-    // #[clap(short, long)]
-    // /// Command to validate the submitted value
-    // validate: Option<String>,
+
 }
 
 impl Confirm {
