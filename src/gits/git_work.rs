@@ -1,5 +1,6 @@
 use std::{error::Error, path::PathBuf};
 
+use git2::Direction;
 use reqwest::Url;
 
 use crate::{
@@ -124,17 +125,33 @@ impl GitWork {
 
         let repo = GitHelper::repo(&self.directory.clone().unwrap()).unwrap();
 
-        let remote_branches = GitHelper::remote(&repo);
+        match GitHelper::fetch_all_and_prune(&repo) {
+            Ok(_) => println!("Fetching all and pruning"),
+            Err(err) => panic!("Unable to fetch all and prune: {err:?}"),
+        }
 
-        let remote_branches = GitHelper::list_remote_branches(&remote_branches).unwrap();
+        let mut remote = GitHelper::remote(&repo);
+        match remote.connect(Direction::Fetch) {
+            Ok(_) => (),
+            Err(err) => panic!("Unable to connect to remote: {err:?}"),
+        }
 
-        let multiselect = MultiSelect::default(CHOOSE_BRANCHES, Some(false), Some(remote_branches))
-            .run()
-            .unwrap();
+        let remote_branches = match GitHelper::list_remote_branches(&remote) {
+            Ok(branches) => branches,
+            Err(err) => panic!("Unable to list remote branches: {err:?}"),
+        };
+
+        let multiselect =
+            match MultiSelect::default(CHOOSE_BRANCHES, Some(false), Some(remote_branches)).run() {
+                Ok(branches) => branches,
+                Err(err) => panic!("Unable to select branches: {err:?}"),
+            };
 
         for branch in multiselect {
-            GitHelper::pull_branch(&repo, &branch).unwrap();
-            println!("Pulling branch: {branch:?}");
+            match GitHelper::pull_branch(&repo, &branch) {
+                Ok(_) => println!("Pulling branch: {branch:?}"),
+                Err(err) => panic!("Unable to pull branch: {err:?}"),
+            }
         }
     }
 
