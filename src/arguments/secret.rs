@@ -38,7 +38,7 @@ impl Secret {
 
         let value = input.interact()?;
 
-        println!("{}", value);
+        println!("{value}");
 
         Ok(())
     }

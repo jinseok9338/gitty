@@ -27,7 +27,7 @@ enum EnquirerSubcommand {
 
 #[tokio::main]
 async fn main() {
-    println!("{}", WELCOME_MESSAGE);
+    println!("{WELCOME_MESSAGE}");
     let select = Select::default(
         CHOOSE_COMMAND,
         None,
@@ -50,7 +50,7 @@ async fn main() {
         _ => panic!("Unexpected variant"),
     };
 
-    println!("You selected: {:?}", behavior);
+    println!("You selected: {behavior:?}");
 
     // this needs url and directory as arguments
 

@@ -27,7 +27,7 @@ impl GitHelper {
         let callbacks = RemoteCallbacks::new();
         fo.remote_callbacks(callbacks);
         remote.fetch(
-            &[&format!("refs/heads/{}:refs/heads/{}", branch, branch)],
+            &[&format!("refs/heads/{branch}:refs/heads/{branch}")],
             Some(&mut fo),
             None,
         )?;
@@ -74,7 +74,7 @@ impl GitHelper {
         // Extract the substring between the two positions
         let repo_url = &url[start..end];
 
-        let repo_url = format!("https://api.github.com/repos/{}/branches", repo_url);
+        let repo_url = format!("https://api.github.com/repos/{repo_url}/branches");
 
         let mut headers = HeaderMap::new();
         headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));

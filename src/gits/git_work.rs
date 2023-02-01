@@ -81,7 +81,7 @@ impl GitWork {
         // spawn multiselect with message choose the branches to pull
         let multiselect = MultiSelect::default(CHOOSE_BRANCHES, Some(false), Some(remote_branches));
         let selected_branches = multiselect.run().unwrap();
-        println!("You chose: {:?} branches", selected_branches);
+        println!("You chose: {selected_branches:?} branches");
 
         let cloned_repo = self
             .git_helper
@@ -91,7 +91,7 @@ impl GitWork {
         // do a git pull for each branch
         for branch in selected_branches {
             self.git_helper.pull_branch(&cloned_repo, &branch).unwrap();
-            println!("Pulling branch: {:?}", branch);
+            println!("Pulling branch: {branch:?}");
         }
         Ok(())
     }
@@ -130,7 +130,7 @@ impl GitWork {
         // do a git pull for each branch
         for branch in multiselect {
             self.git_helper.pull_branch(&repo, &branch).unwrap();
-            println!("Pulling branch: {:?}", branch);
+            println!("Pulling branch: {branch:?}");
         }
 
         Ok(())
@@ -166,7 +166,7 @@ impl GitWork {
         // delete the branches
         for branch in multiselect {
             self.git_helper.delete_branch(&repo, &branch).unwrap();
-            println!("Deleting branch: {:?}", branch);
+            println!("Deleting branch: {branch:?}");
         }
         Ok(())
     }
