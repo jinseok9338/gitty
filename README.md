@@ -4,16 +4,22 @@ Gitty is a simple git CLI tool that allows you to create a new repository on Git
 
 ## Installation
 
-todo
+Gitty is standard rust project. You can install it with cargo.
+
+```bash
+
+cargo build --release
+
+```
+
 
 ## Usage
+### you can can clone the repo to the directory you desire and pull the branches that you can choose from the command prompt
 
 ```
-#cloning the repo to your local machine with directory provided and sync it with remote branches
-gitty up --url https://github.com/jinseok9338/xxxxx.git --directory .
+
 ```
-```
-#you can omit the directory option and it will clone the repo to the current directory
+### you can omit the directory option and it will clone the repo to the current directory
 gitty up --url https://github.com/jinseok9338/xxxxx.git 
 ```
 
