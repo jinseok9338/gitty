@@ -11,16 +11,15 @@ use tokio::spawn;
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
 
-
 #[derive(Debug)]
 pub struct GitHelper {}
 
 impl GitHelper {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {}
     }
 
-    pub fn pull_branch(&self, repo: &Repository, branch: &str) -> Result<(), Error> {
+    pub fn pull_branch(repo: &Repository, branch: &str) -> Result<(), Error> {
         let mut remote = repo.find_remote("origin")?;
         let mut fo = git2::FetchOptions::new();
         let callbacks = RemoteCallbacks::new();
@@ -33,14 +32,14 @@ impl GitHelper {
         Ok(())
     }
 
-    pub fn delete_branch(&self, repo: &Repository, branch_name: &str) -> Result<(), Error> {
+    pub fn delete_branch(repo: &Repository, branch_name: &str) -> Result<(), Error> {
         let mut branch = repo.find_branch(branch_name, BranchType::Local)?;
         branch.delete()?;
 
         Ok(())
     }
 
-    pub fn clone_repo(&self, url: &str, directory: &Path) -> Result<Repository, Error> {
+    pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, Error> {
         let project_name = url.split('/').last().unwrap().split('.').next().unwrap();
 
         let directory = directory.join(project_name);
@@ -55,7 +54,7 @@ impl GitHelper {
         repo
     }
 
-    pub fn repo(&self, directory: &PathBuf) -> Result<Repository, Error> {
+    pub fn repo(directory: &PathBuf) -> Result<Repository, Error> {
         Repository::open(directory)
     }
 
@@ -87,14 +86,14 @@ impl GitHelper {
         Ok(branches_names)
     }
 
-    pub fn remote<'a>(&'a self, repo: &'a Repository) -> Result<Remote, Error> {
+    pub fn remote(repo: &Repository) -> Remote {
         let remote = repo.find_remote("origin");
         let remote = remote.unwrap();
         let remote = Box::new(remote);
-        Ok(*remote)
+        *remote
     }
 
-    pub fn list_remote_branches(&self, remote: &Remote) -> Result<Vec<String>, Error> {
+    pub fn list_remote_branches(remote: &Remote) -> Result<Vec<String>, Error> {
         let branches = remote.list()?;
         let remote_branches = branches
             .iter()
@@ -105,7 +104,7 @@ impl GitHelper {
         Ok(remote_branches)
     }
 
-    pub fn list_local_branches(&self, repo: &Repository) -> Result<Vec<String>, Error> {
+    pub fn list_local_branches(repo: &Repository) -> Result<Vec<String>, Error> {
         let branches = repo.branches(None)?;
         let local_branches = branches
             .map(|branch| branch.unwrap().0.name().unwrap().unwrap().to_string())
@@ -114,7 +113,6 @@ impl GitHelper {
     }
 
     pub fn _list_differece_branches(
-        &self,
         local_branches: &[String],
         remote_branches: &Vec<String>,
     ) -> Vec<String> {

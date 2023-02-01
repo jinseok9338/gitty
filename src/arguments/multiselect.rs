@@ -4,6 +4,7 @@ use dialoguer::theme::ColorfulTheme;
 use std::{io::Result, iter::repeat};
 
 /// Prompt that allows the user to select multiple items from a list of options
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Parser)]
 pub struct MultiSelect {
     /// Message for the prompt
@@ -72,13 +73,12 @@ impl Run<Vec<String>, std::io::Error> for MultiSelect {
             Some(input.interact()?)
         };
 
-        let value = match ret {
-            Some(value) => value
+        let value = ret.map_or_else(std::vec::Vec::new, |value| {
+            value
                 .iter()
                 .map(|i| self.items[*i].clone())
-                .collect::<Vec<String>>(),
-            None => vec![],
-        };
+                .collect::<Vec<String>>()
+        });
 
         Ok(value)
     }

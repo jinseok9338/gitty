@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 pub enum UserInput {
     Clone(String),

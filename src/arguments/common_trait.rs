@@ -1,5 +1,3 @@
-
-
 pub trait Run<T, E> {
     fn run(&self) -> Result<T, E>;
 }
