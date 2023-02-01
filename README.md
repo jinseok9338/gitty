@@ -27,11 +27,13 @@ https://user-images.githubusercontent.com/27854958/216049920-e559cb46-87c3-42c3-
 ### you can delete local branches that you don't need anymore
 https://user-images.githubusercontent.com/27854958/216050925-db882257-f6d2-4793-8573-f46c06d72b45.mov
 
-###TODO
+### TODO
 1. should clone private repo with auth provided
 2. error handling when pulling the repo that conflicts with remote
 3. better color theme and welcome banner
 4. need testing
+5. make config file so you can fine tune how the app works (like auth)
+6. clone the repo through ssh
 
 
 ## Contributing
