@@ -5,11 +5,11 @@ mod gits;
 extern crate termion;
 
 use arguments::{
-    confirm::Confirm, input::Input, multiselect::MultiSelect, secret::Secret, select::Select,
+     select::Select,
 };
 use color_eyre::eyre::Result;
 
-use clap::Parser;
+
 use gits::{behavior::UserInput, git_work::GitWork};
 use tokio::{self};
 
@@ -18,14 +18,6 @@ use crate::{
     consts::{CHOOSE_COMMAND, OPTION_MESSAGES, WELCOME_MESSAGE},
 };
 
-#[derive(Debug, Parser)]
-enum EnquirerSubcommand {
-    Confirm(Confirm),
-    Input(Input),
-    Secret(Secret),
-    MultiSelect(MultiSelect),
-    Select(Select),
-}
 
 #[tokio::main]
 async fn main() -> Result<()> {
