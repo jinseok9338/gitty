@@ -1,6 +1,7 @@
 mod arguments;
 mod consts;
 mod gits;
+mod setting;
 
 extern crate termion;
 

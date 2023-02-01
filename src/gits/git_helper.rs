@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    f32::consts::E,
+    path::{Path, PathBuf},
+};
 
 use git2::{build::RepoBuilder, BranchType, Error, Remote, RemoteCallbacks, Repository};
 
@@ -8,7 +11,7 @@ use reqwest::{
 };
 use tokio::spawn;
 
-use crate::consts::PROPER_URL_WARNING;
+use crate::{consts::PROPER_URL_WARNING, setting::read_setting::Settings};
 
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
@@ -85,10 +88,27 @@ impl GitHelper {
 
         let branches_names = spawn(async move {
             let client = ClientBuilder::new().build().unwrap();
-            let response = client.get(&repo_url).headers(headers).send().await;
+            let settings = Settings::new();
+            let response = client
+                .get(&repo_url)
+                .headers(headers)
+                .header("Accept", "application/vnd.github+json")
+                .header(
+                    "Authorization",
+                    format!("Bearer {}", settings.git_hub_auth_token),
+                )
+                .header("X-GitHub-Api-Version", "2022-11-28")
+                .send()
+                .await;
             let response = response.unwrap();
-            let branches_names = response.json::<Vec<Branch>>().await.unwrap();
-            let branches_names: Vec<String> = branches_names
+            let response = response.json::<Vec<Branch>>().await;
+
+            let branch_names = match response {
+                Ok(branches_names) => branches_names,
+                Err(err) => panic!("Error while fecching branches names: {:?} ", err),
+            };
+
+            let branches_names: Vec<String> = branch_names
                 .iter()
                 .map(|branch| branch.name.to_string())
                 .collect();
