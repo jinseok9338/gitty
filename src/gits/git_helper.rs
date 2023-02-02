@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use git2::{build::RepoBuilder, BranchType, Error, Remote, RemoteCallbacks, Repository};
+use git2::{build::RepoBuilder, BranchType, Cred, Error, Remote, RemoteCallbacks, Repository};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
@@ -53,7 +53,9 @@ impl GitHelper {
     }
 
     pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, git2::Error> {
+    
         let project_name = url.split('/').last().unwrap().split('.').next().unwrap();
+      
 
         let directory = directory.join(project_name);
 
@@ -76,41 +78,56 @@ impl GitHelper {
 
         let end = url.find(".git").expect(PROPER_URL_WARNING);
 
-        let repo_url = &url[start..end];
+        let repo = &url[start..end];
+        let repo_url = format!("https://api.github.com/repos/{repo}/branches?per_page=100");
 
-        let repo_url = format!("https://api.github.com/repos/{repo_url}/branches");
-
-        let mut headers = HeaderMap::new();
-        headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
-
+  
         let branches_names = spawn(async move {
-            let client = ClientBuilder::new().build().unwrap();
+
             let settings = Settings::new();
-            let response = client
-                .get(&repo_url)
-                .headers(headers)
-                .header("Accept", "application/vnd.github+json")
-                .header(
-                    "Authorization",
-                    format!("Bearer {}", settings.git_hub_auth_token),
-                )
-                .header("X-GitHub-Api-Version", "2022-11-28")
-                .send()
-                .await;
-            let response = response.unwrap();
-            let response = response.json::<Vec<Branch>>().await;
-
-            let branch_names = match response {
-                Ok(branches_names) => branches_names,
-                Err(err) => panic!("Error while fecching branches names: {:?} ", err),
-            };
-
-            let branches_names: Vec<String> = branch_names
-                .iter()
-                .map(|branch| branch.name.to_string())
-                .collect();
-
-            branches_names
+         
+            let mut branches:Vec<String> = vec![];
+            let mut page = 1;
+         
+            loop{
+                let repo_url = repo_url.clone();
+               
+                let repo_url = format!("{}&page={}", repo_url, page);
+                let client = ClientBuilder::new().build().unwrap();
+                let mut headers = HeaderMap::new();
+                headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
+                let response = client
+                    .get(&repo_url)
+                    .headers(headers)
+                    .header("Accept", "application/vnd.github+json")
+                    .header(
+                        "Authorization",
+                        format!("Bearer {}", settings.git_hub_auth_token),
+                    )
+                    .header("X-GitHub-Api-Version", "2022-11-28")
+                    .send()
+                    .await;
+                let response = response.unwrap();
+              
+                let response = response.json::<Vec<Branch>>().await;
+                
+                match response {
+                    Ok(branches_names) => {
+                        if branches_names.len() == 0{
+                            break;
+                        }
+                        let branches_names: Vec<String> = branches_names
+                            .iter()
+                            .map(|branch| branch.name.to_string())
+                            .collect();
+                        branches.extend(branches_names);
+                    }
+                    Err(err) => panic!("Error while fecching branches names: {:?} ", err),
+                }
+                page += 1;
+            }
+        
+            branches
         });
         let branches_names = branches_names.await.unwrap();
         Ok(branches_names)

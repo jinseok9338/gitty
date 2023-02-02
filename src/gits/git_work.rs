@@ -94,7 +94,7 @@ impl GitWork {
             // have different error behavior for different errors
             Err(err) => {
                 match err.code() {
-                    git2::ErrorCode::GenericError => panic!("This is generic Error"),
+                    git2::ErrorCode::GenericError => panic!("This is generic Error : {err:?}"),
                     git2::ErrorCode::NotFound =>  panic!("The cloned repo not found"),
                     git2::ErrorCode::Exists => panic!("The repo already exists and is not an empty directory choose different directory to clone your project"),
                     _ => panic!("Unexpected error: {err:?}"),
