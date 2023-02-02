@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use git2::{build::RepoBuilder, BranchType, Cred, Error, Remote, RemoteCallbacks, Repository};
+use git2::{build::RepoBuilder, BranchType, Error, Remote, RemoteCallbacks, Repository};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
@@ -53,9 +53,7 @@ impl GitHelper {
     }
 
     pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, git2::Error> {
-    
         let project_name = url.split('/').last().unwrap().split('.').next().unwrap();
-      
 
         let directory = directory.join(project_name);
 
@@ -81,17 +79,15 @@ impl GitHelper {
         let repo = &url[start..end];
         let repo_url = format!("https://api.github.com/repos/{repo}/branches?per_page=100");
 
-  
         let branches_names = spawn(async move {
-
             let settings = Settings::new();
-         
-            let mut branches:Vec<String> = vec![];
+
+            let mut branches: Vec<String> = vec![];
             let mut page = 1;
-         
-            loop{
+
+            loop {
                 let repo_url = repo_url.clone();
-               
+
                 let repo_url = format!("{}&page={}", repo_url, page);
                 let client = ClientBuilder::new().build().unwrap();
                 let mut headers = HeaderMap::new();
@@ -108,12 +104,12 @@ impl GitHelper {
                     .send()
                     .await;
                 let response = response.unwrap();
-              
+
                 let response = response.json::<Vec<Branch>>().await;
-                
+
                 match response {
                     Ok(branches_names) => {
-                        if branches_names.len() == 0{
+                        if branches_names.is_empty() {
                             break;
                         }
                         let branches_names: Vec<String> = branches_names
@@ -126,7 +122,7 @@ impl GitHelper {
                 }
                 page += 1;
             }
-        
+
             branches
         });
         let branches_names = branches_names.await.unwrap();
