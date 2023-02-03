@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use git2::{build::RepoBuilder, BranchType, Error, Remote, RemoteCallbacks, Repository, Cred};
+use git2::{build::RepoBuilder, BranchType, Cred, Error, Remote, RemoteCallbacks, Repository};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
@@ -54,28 +54,27 @@ impl GitHelper {
 
     pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, git2::Error> {
         let project_name = url.split('/').last().unwrap().split('.').next().unwrap();
-        let settings = Settings::new();
+        let _settings = Settings::new();
 
         let directory = directory.join(project_name);
         let url = Url::parse(url).unwrap();
         //url to string
         let url = url.to_string();
-       
-        
+
         let mut callbacks = RemoteCallbacks::new();
-        callbacks.credentials(move |_,_,_| {
-            let credentials = 
-            Cred::ssh_key(
-                "jinseok9338@gmail.com", 
-                Some(Path::new("Users/jinseok9338/.ssh/id_rsa.pub")), 
-                Path::new("Users/jinseok9338/.ssh/id_rsa"), 
-                Some("lazctlazct93!@")
-            ).expect("Could not create credentials object");
+        callbacks.credentials(move |_, _, _| {
+            let credentials = Cred::ssh_key(
+                "jinseok9338@gmail.com",
+                Some(Path::new("Users/jinseok9338/.ssh/id_rsa.pub")),
+                Path::new("Users/jinseok9338/.ssh/id_rsa"),
+                Some("lazctlazct93!@"),
+            )
+            .expect("Could not create credentials object");
             Ok(credentials)
         });
         let mut fo = git2::FetchOptions::new();
         fo.remote_callbacks(callbacks);
-      
+
         println!("Cloning {} into {:?}", url, directory);
         let repo = RepoBuilder::new().fetch_options(fo).clone(&url, &directory);
 
