@@ -8,7 +8,7 @@ use reqwest::{
 };
 use tokio::spawn;
 
-use crate::{consts::PROPER_URL_WARNING, setting::read_setting::Settings, run_cmd};
+use crate::{consts::PROPER_URL_WARNING, run_cmd, setting::read_setting::Settings};
 
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
@@ -56,26 +56,35 @@ impl GitHelper {
         let parts: Vec<&str> = url.split('/').collect();
         let username = parts[3];
         let project = parts[4].trim_end_matches(".git");
-        format!("https://{}:{}@github.com/{}/{}.git", access_token, "x-oauth-basic", username, project)
+        format!(
+            "https://{}:{}@github.com/{}/{}.git",
+            access_token, "x-oauth-basic", username, project
+        )
     }
 
     pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, git2::Error> {
         let url = Url::parse(url).unwrap();
         let binding = url.to_string();
-        let project_name = binding.split('/').last().unwrap().split('.').next().unwrap();
+        let project_name = binding
+            .split('/')
+            .last()
+            .unwrap()
+            .split('.')
+            .next()
+            .unwrap();
         let settings = Settings::new();
 
         let directory = directory.join(project_name);
-      
+
         let url = Self::change_url(&binding, &settings.git_hub_auth_token);
         println!("{url}");
 
         let command = format!("git clone {} {}", url, directory.display());
-        match run_cmd!(command){
+        match run_cmd!(command) {
             Ok(_) => {}
             Err(err) => panic!("Error while cloning repo: {err:?}"),
         }
-        
+
         Self::repo(&directory)
     }
 
