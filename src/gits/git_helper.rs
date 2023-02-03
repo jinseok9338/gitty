@@ -72,7 +72,7 @@ impl GitHelper {
 
         let command = format!("git clone {} {}", url, directory.display());
         match run_cmd!(command){
-            Ok(msg) => {println!("{:?}", msg)}
+            Ok(_) => {}
             Err(err) => panic!("Error while cloning repo: {:?}", err),
         }
         let repo = Self::repo(&directory);
