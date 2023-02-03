@@ -8,7 +8,7 @@ use reqwest::{
 };
 use tokio::spawn;
 
-use crate::{consts::PROPER_URL_WARNING, setting::read_setting::Settings};
+use crate::{consts::PROPER_URL_WARNING, setting::read_setting::Settings, run_cmd};
 
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
@@ -52,32 +52,30 @@ impl GitHelper {
         Ok(())
     }
 
+    fn change_url(url: &str, access_token: &str) -> String {
+        let parts: Vec<&str> = url.split("/").collect();
+        let username = parts[3];
+        let project = parts[4].trim_end_matches(".git");
+        format!("https://{}:{}@github.com/{}/{}.git", access_token, "x-oauth-basic", username, project)
+    }
+
     pub fn clone_repo(url: &str, directory: &Path) -> Result<Repository, git2::Error> {
-        let project_name = url.split('/').last().unwrap().split('.').next().unwrap();
-        let _settings = Settings::new();
+        let url = Url::parse(url).unwrap();
+        let binding = url.to_string();
+        let project_name = binding.split('/').last().unwrap().split('.').next().unwrap();
+        let settings = Settings::new();
 
         let directory = directory.join(project_name);
-        let url = Url::parse(url).unwrap();
-        //url to string
-        let url = url.to_string();
+      
+        let url = Self::change_url(&binding, &settings.git_hub_auth_token);
+        println!("{}", url);
 
-        let mut callbacks = RemoteCallbacks::new();
-        callbacks.credentials(move |_, _, _| {
-            let credentials = Cred::ssh_key(
-                "jinseok9338@gmail.com",
-                Some(Path::new("Users/jinseok9338/.ssh/id_rsa.pub")),
-                Path::new("Users/jinseok9338/.ssh/id_rsa"),
-                Some("lazctlazct93!@"),
-            )
-            .expect("Could not create credentials object");
-            Ok(credentials)
-        });
-        let mut fo = git2::FetchOptions::new();
-        fo.remote_callbacks(callbacks);
-
-        println!("Cloning {} into {:?}", url, directory);
-        let repo = RepoBuilder::new().fetch_options(fo).clone(&url, &directory);
-
+        let command = format!("git clone {} {}", url, directory.display());
+        match run_cmd!(command){
+            Ok(msg) => {println!("{:?}", msg)}
+            Err(err) => panic!("Error while cloning repo: {:?}", err),
+        }
+        let repo = Self::repo(&directory);
         repo
     }
 
