@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use git2::{build::RepoBuilder, BranchType, Cred, Error, Remote, RemoteCallbacks, Repository};
+use git2::{BranchType, Error, Remote, RemoteCallbacks, Repository};
 
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
@@ -53,7 +53,7 @@ impl GitHelper {
     }
 
     fn change_url(url: &str, access_token: &str) -> String {
-        let parts: Vec<&str> = url.split("/").collect();
+        let parts: Vec<&str> = url.split('/').collect();
         let username = parts[3];
         let project = parts[4].trim_end_matches(".git");
         format!("https://{}:{}@github.com/{}/{}.git", access_token, "x-oauth-basic", username, project)
@@ -68,15 +68,15 @@ impl GitHelper {
         let directory = directory.join(project_name);
       
         let url = Self::change_url(&binding, &settings.git_hub_auth_token);
-        println!("{}", url);
+        println!("{url}");
 
         let command = format!("git clone {} {}", url, directory.display());
         match run_cmd!(command){
             Ok(_) => {}
-            Err(err) => panic!("Error while cloning repo: {:?}", err),
+            Err(err) => panic!("Error while cloning repo: {err:?}"),
         }
-        let repo = Self::repo(&directory);
-        repo
+        
+        Self::repo(&directory)
     }
 
     pub fn repo(directory: &PathBuf) -> Result<Repository, Error> {
@@ -100,7 +100,7 @@ impl GitHelper {
             loop {
                 let repo_url = repo_url.clone();
 
-                let repo_url = format!("{}&page={}", repo_url, page);
+                let repo_url = format!("{repo_url}&page={page}");
                 let client = ClientBuilder::new().build().unwrap();
                 let mut headers = HeaderMap::new();
                 headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
@@ -130,7 +130,7 @@ impl GitHelper {
                             .collect();
                         branches.extend(branches_names);
                     }
-                    Err(err) => panic!("Error while fecching branches names: {:?} ", err),
+                    Err(err) => panic!("Error while fecching branches names: {err:?} "),
                 }
                 page += 1;
             }
