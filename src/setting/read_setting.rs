@@ -9,7 +9,6 @@ pub struct Settings {
 
 impl Settings {
     pub fn new() -> Self {
-     
         let home_dir = env::var("HOME").expect("Unable to get home directory");
 
         let zshrc_path = Path::new(&home_dir).join(".zshrc");
