@@ -6,9 +6,7 @@ use reqwest::Url;
 use crate::{
     arguments::{
         common_trait::{Default, Run},
-
         confirm::Confirm,
-
         input::Input,
         multiselect::MultiSelect,
     },
@@ -17,20 +15,16 @@ use crate::{
 
 use super::{behavior::UserInput, git_helper::GitHelper};
 
-
 pub struct GitWork<'a> {
     git_helper: GitHelper,
     input: UserInput<'a>,
-
 
     url: Option<String>,
     directory: Option<PathBuf>,
 }
 
-
 impl<'a> GitWork<'a> {
     pub const fn new(input: UserInput<'a>) -> Self {
-
         Self {
             git_helper: GitHelper::new(),
             input,
@@ -98,7 +92,6 @@ impl<'a> GitWork<'a> {
 
         let cloned_repo =
             GitHelper::clone_repo(&self.url.clone().unwrap(), &self.directory.clone().unwrap());
-
 
         let cloned_repo = match cloned_repo {
             Ok(repo) => repo,
