@@ -1,41 +1,31 @@
-
+use super::common_trait::{Default, Run};
 use dialoguer::theme::ColorfulTheme;
 use std::fmt::Debug;
-use super::common_trait::{Default, Run};
 
-use std::{error::Error};
-
+use std::error::Error;
 
 /// Prompt that allows the user to select from a list of options
 #[derive(Debug)]
-pub struct Select<T:Clone +Send + Sync + Debug>{
+pub struct Select<T: Clone + Send + Sync + Debug> {
     /// Message for the prompt
-   
     message: String,
 
     /// Makes the prompt cancellable with 'Esc' or 'q'
-    
     cancel: bool,
 
     /// Makes the prompt return default order as given if --cancel option is present
- 
     return_default: bool,
 
     /// Returns index of the selected item instead of item itself
-
     index: bool,
 
     /// Specify number of the item that will be selected by default
-  
     selected: Option<usize>,
 
-   
     items: Vec<T>,
 }
 
-
-
-impl<T:Clone +Send + Sync +Debug > Run<T, Box<dyn Error>> for Select<T> {
+impl<T: Clone + Send + Sync + Debug> Run<T, Box<dyn Error>> for Select<T> {
     fn run(&self) -> Result<T, Box<dyn Error>> {
         let item_len = self.items.len();
 
@@ -53,10 +43,7 @@ impl<T:Clone +Send + Sync +Debug > Run<T, Box<dyn Error>> for Select<T> {
             items.push(format!("{:?}", item));
         }
 
-        input
-            .with_prompt(&self.message)
-            .clear(true)
-            .items(&items);
+        input.with_prompt(&self.message).clear(true).items(&items);
 
         let selected = self.selected.map(|i| i - 1);
 
@@ -78,13 +65,16 @@ impl<T:Clone +Send + Sync +Debug > Run<T, Box<dyn Error>> for Select<T> {
 
         let result = self.items[value].clone();
 
-    
         Ok(result)
     }
 }
 
-impl<T:Clone +Send + Sync+Debug > Default<T> for Select<T> {
-    fn default(message: &str, can_be_nullable: Option<bool>, items: std::option::Option<Vec<T>>) -> Self {
+impl<T: Clone + Send + Sync + Debug> Default<T> for Select<T> {
+    fn default(
+        message: &str,
+        can_be_nullable: Option<bool>,
+        items: std::option::Option<Vec<T>>,
+    ) -> Self {
         Self {
             message: message.to_string(),
             return_default: false,

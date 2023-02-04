@@ -1,15 +1,12 @@
 use std::fmt;
 
-
-
-#[derive(Debug,Clone,PartialEq,Eq,Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UserInput<'a> {
     Clone(&'a str),
     HardSync(&'a str),
     SoftSync(&'a str),
     Purge(&'a str),
 }
-
 
 impl<'a> fmt::Display for UserInput<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -21,5 +18,3 @@ impl<'a> fmt::Display for UserInput<'a> {
         }
     }
 }
-
-

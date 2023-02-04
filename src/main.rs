@@ -12,8 +12,8 @@ use gits::{behavior::UserInput, git_work::GitWork};
 use tokio::{self};
 
 use crate::{
-   
-    consts::{CHOOSE_COMMAND, OPTION_MESSAGES, WELCOME_MESSAGE}, arguments::common_trait::{Default, Run},
+    arguments::common_trait::{Default, Run},
+    consts::{CHOOSE_COMMAND, OPTION_MESSAGES, WELCOME_MESSAGE},
 };
 
 #[tokio::main]
@@ -23,20 +23,13 @@ async fn main() -> Result<()> {
 
     // make OPTION_MESSAGES to vec of Userinput
 
-   
-
-    let select = Select::<UserInput>::default(
-        CHOOSE_COMMAND,
-        None,
-        Some(OPTION_MESSAGES.to_vec()),
-    );
+    let select = Select::<UserInput>::default(CHOOSE_COMMAND, None, Some(OPTION_MESSAGES.to_vec()));
 
     let behavior = select.run();
     let behavior = match behavior {
         Ok(behavior) => behavior,
         Err(_) => panic!("Error in selecting the option"),
     };
-
 
     println!("You selected: {behavior:?}");
 
