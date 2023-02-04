@@ -92,7 +92,6 @@ impl GitHelper {
         let directory = directory.join(project_name);
 
         let url = Self::change_url(&binding, &settings.git_hub_auth_token);
-       
 
         let command = format!("git clone {} {}", url, directory.display());
         match run_cmd!(command) {
@@ -117,7 +116,6 @@ impl GitHelper {
 
         let branches_names = spawn(async move {
             let settings = Settings::new();
-           
 
             let mut branches: Vec<String> = vec![];
             let mut page = 1;
