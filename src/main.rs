@@ -21,6 +21,7 @@ async fn main() -> Result<()> {
     color_eyre::install()?;
     println!("{WELCOME_MESSAGE}");
 
+
     // make OPTION_MESSAGES to vec of Userinput
 
     let select = Select::<UserInput>::default(CHOOSE_COMMAND, None, Some(OPTION_MESSAGES.to_vec()));
@@ -30,6 +31,7 @@ async fn main() -> Result<()> {
         |_| panic!("Error in selecting the option"),
         |behavior| behavior,
     );
+
 
     println!("You selected: {behavior:?}");
 

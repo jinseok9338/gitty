@@ -1,3 +1,4 @@
+
 use crate::gits::behavior::UserInput;
 
 pub const WELCOME_MESSAGE: &str = "welcome to GITTY.";
@@ -7,6 +8,7 @@ pub const OPTION_MESSAGES: &[UserInput] = &[
     UserInput::HardSync("sync the existing project with remote repo (Hard reset)"),
     UserInput::SoftSync("sync the existing project with remote repo (Soft reset)"),
     UserInput::Purge("delete unnecessary branches"),
+
 ];
 pub const CHOOSE_BRANCHES: &str = "Choose the branches to pull:";
 pub const DEFAULT_BRANCH: &str = "default branch will be pulled automatically";
