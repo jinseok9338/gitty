@@ -262,34 +262,32 @@ impl<'a> GitWork<'a> {
 
         let repo = GitHelper::repo(&self.directory.clone().unwrap()).unwrap();
 
-
-
         let local_branches = GitHelper::list_local_branches(&repo).unwrap();
-        
+
         let current_branch =
-        GitHelper::current_branch(&repo).expect("Unable to get current branch");
+            GitHelper::current_branch(&repo).expect("Unable to get current branch");
 
         let local_branches: Vec<String> = local_branches
             .into_iter()
             .filter(|b| b != &current_branch)
             .collect();
 
-
         let multiselect =
             MultiSelect::default(CHOOSE_DELETE_BRANCHES, Some(false), Some(local_branches))
                 .run()
                 .unwrap();
-        
 
+        let confirm = Confirm::default(
+            "This action will delete the branches you choose. You want to continue?",
+            None,
+            None,
+        );
 
-
-                let confirm = Confirm::default("This action will delete the branches you choose. You want to continue?", None, None);
-
-                match confirm.run() {
-                    Ok(true) => (),
-                    Ok(false) => return,
-                    Err(err) => panic!("Unable to confirm: {err:?}"),
-                };       
+        match confirm.run() {
+            Ok(true) => (),
+            Ok(false) => return,
+            Err(err) => panic!("Unable to confirm: {err:?}"),
+        };
 
         for branch in multiselect {
             GitHelper::delete_branch(&repo, &branch).unwrap();
