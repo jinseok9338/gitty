@@ -88,7 +88,6 @@ impl GitWork {
         let cloned_repo =
             GitHelper::clone_repo(&self.url.clone().unwrap(), &self.directory.clone().unwrap());
 
-     
         let cloned_repo = match cloned_repo {
             Ok(repo) => repo,
             // have different error behavior for different errors
@@ -149,12 +148,16 @@ impl GitWork {
             };
 
         // delete the branches that is the current head of the repo
-        let current_branch = GitHelper::current_branch(&repo).expect("Unable to get current branch");
-   
+        let current_branch =
+            GitHelper::current_branch(&repo).expect("Unable to get current branch");
 
         //delete the branches except the current_branch before pulling
 
-        for branch in multiselect.clone().into_iter().filter(|b| b != &current_branch) {
+        for branch in multiselect
+            .clone()
+            .into_iter()
+            .filter(|b| b != &current_branch)
+        {
             match GitHelper::delete_branch(&repo, &branch) {
                 Ok(_) => println!("Deleting branch: {branch:?}"),
                 Err(err) => panic!("Unable to delete branch: {err:?}"),
