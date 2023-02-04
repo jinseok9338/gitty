@@ -129,16 +129,14 @@ impl GitHelper {
                 headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
                 let response = if settings.git_hub_auth_token.is_empty() {
                     client
-                    .get(&repo_url)
-                    .headers(headers)
-                    .header("Accept", "application/vnd.github+json")
-                    .header("X-GitHub-Api-Version", "2022-11-28")
-                    .send()
-                    .await
+                        .get(&repo_url)
+                        .headers(headers)
+                        .header("Accept", "application/vnd.github+json")
+                        .header("X-GitHub-Api-Version", "2022-11-28")
+                        .send()
+                        .await
                 } else {
-                   
-
-                        client
+                    client
                         .get(&repo_url)
                         .headers(headers)
                         .header("Accept", "application/vnd.github+json")
