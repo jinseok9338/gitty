@@ -84,7 +84,7 @@ impl Run<Vec<String>, std::io::Error> for MultiSelect {
     }
 }
 
-impl Default for MultiSelect {
+impl Default<String> for MultiSelect {
     fn default(message: &str, can_be_nullable: Option<bool>, items: Option<Vec<String>>) -> Self {
         Self {
             message: message.to_string(),

@@ -14,15 +14,15 @@ use crate::{
 
 use super::{behavior::UserInput, git_helper::GitHelper};
 
-pub struct GitWork {
+pub struct GitWork<'a> {
     git_helper: GitHelper,
-    input: UserInput,
+    input: UserInput<'a>,
     url: Option<String>,
     directory: Option<PathBuf>,
 }
 
-impl GitWork {
-    pub const fn new(input: UserInput) -> Self {
+impl<'a> GitWork<'a> {
+    pub const fn new(input: UserInput<'a>) -> Self {
         Self {
             git_helper: GitHelper::new(),
             input,
@@ -34,7 +34,8 @@ impl GitWork {
     pub async fn run(&mut self) {
         match self.input {
             UserInput::Clone(_) => self.gitty_clone_repo().await.unwrap(),
-            UserInput::Sync(_) => self.gitty_sync(),
+            UserInput::HardSync(_) => self.gitty_sync(),
+            UserInput::SoftSync(_) => self.gitty_sync(), // change it to soft Sync
             UserInput::Purge(_) => self.purge_branches(),
         }
     }
