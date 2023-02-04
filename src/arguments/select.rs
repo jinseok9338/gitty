@@ -16,7 +16,6 @@ pub struct Select<T: Clone + Send + Sync + Debug> {
     /// Makes the prompt return default order as given if --cancel option is present
     return_default: bool,
 
-
     /// Specify number of the item that will be selected by default
     selected: Option<usize>,
 
@@ -77,7 +76,7 @@ impl<T: Clone + Send + Sync + Debug> Default<T> for Select<T> {
             message: message.to_string(),
             return_default: false,
             cancel: can_be_nullable.unwrap_or(false),
-   
+
             selected: Some(1),
             items: items.unwrap(),
         }
