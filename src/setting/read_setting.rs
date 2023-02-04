@@ -9,8 +9,7 @@ pub struct Settings {
 
 impl Settings {
     pub fn new() -> Self {
-        //run command to get the directory of ~/.zshrc with run_cmd macro
-        //run command to get the directory of ~/.bashrc with run_cmd macro
+     
         let home_dir = env::var("HOME").expect("Unable to get home directory");
 
         let zshrc_path = Path::new(&home_dir).join(".zshrc");
