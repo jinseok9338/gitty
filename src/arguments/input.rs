@@ -40,7 +40,7 @@ impl Run<String, Box<dyn std::error::Error>> for Input {
     }
 }
 
-impl Default for Input {
+impl Default<String> for Input {
     fn default(message: &str, can_be_nullable: Option<bool>, _items: Option<Vec<String>>) -> Self {
         Self {
             message: message.to_string(),
