@@ -6,6 +6,7 @@ use reqwest::Url;
 use crate::{
     arguments::{
         common_trait::{Default, Run},
+        confirm::Confirm,
         input::Input,
         multiselect::MultiSelect,
     },
@@ -34,8 +35,8 @@ impl<'a> GitWork<'a> {
     pub async fn run(&mut self) {
         match self.input {
             UserInput::Clone(_) => self.gitty_clone_repo().await.unwrap(),
-            UserInput::HardSync(_) => self.gitty_sync(),
-            UserInput::SoftSync(_) => self.gitty_sync(), // change it to soft Sync
+            UserInput::HardSync(_) => self.gitty_sync_hard(),
+            UserInput::SoftSync(_) => self.gitty_sync_soft(), // change it to soft Sync
             UserInput::Purge(_) => self.purge_branches(),
         }
     }
@@ -112,7 +113,7 @@ impl<'a> GitWork<'a> {
         Ok(())
     }
 
-    fn gitty_sync(&mut self) {
+    fn gitty_sync_hard(&mut self) {
         loop {
             let directory = Input::default("Enter the directory:", None, None)
                 .run()
@@ -123,6 +124,17 @@ impl<'a> GitWork<'a> {
                 break;
             }
         }
+
+        //Confirm warning message: "This action will fetch and prune all remote branches are you sure you want to continue?"
+        // if yes then continue else return
+
+        let confirm = Confirm::default("This action will fetch and prune all remote branches are you sure you want to continue?", None, None);
+
+        match confirm.run() {
+            Ok(true) => (),
+            Ok(false) => return,
+            Err(err) => panic!("Unable to confirm: {err:?}"),
+        };
 
         let repo = GitHelper::repo(&self.directory.clone().unwrap()).unwrap();
 
@@ -148,7 +160,18 @@ impl<'a> GitWork<'a> {
                 Err(err) => panic!("Unable to select branches: {err:?}"),
             };
 
-        // delete the branches that is the current head of the repo
+        let confirm = Confirm::default(
+            "This action will delete except the current branch and pull from the fresh branches",
+            None,
+            None,
+        );
+
+        match confirm.run() {
+            Ok(true) => (),
+            Ok(false) => return,
+            Err(err) => panic!("Unable to confirm: {err:?}"),
+        };
+
         let current_branch =
             GitHelper::current_branch(&repo).expect("Unable to get current branch");
 
@@ -173,6 +196,58 @@ impl<'a> GitWork<'a> {
         }
     }
 
+    fn gitty_sync_soft(&mut self) {
+        loop {
+            let directory = Input::default("Enter the directory:", None, None)
+                .run()
+                .unwrap();
+
+            if PathBuf::from(&directory).exists() {
+                self.directory = Some(PathBuf::from(&directory));
+                break;
+            }
+        }
+
+        let repo = GitHelper::repo(&self.directory.clone().unwrap()).unwrap();
+
+        match GitHelper::fetch_all(&repo) {
+            Ok(_) => println!("Fetching all"),
+            Err(err) => panic!("Unable to fetch all: {err:?}"),
+        }
+
+        let mut remote = GitHelper::remote(&repo);
+        match remote.connect(Direction::Fetch) {
+            Ok(_) => (),
+            Err(err) => panic!("Unable to connect to remote: {err:?}"),
+        }
+
+        let remote_branches = match GitHelper::list_remote_branches(&remote) {
+            Ok(branches) => branches,
+            Err(err) => panic!("Unable to list remote branches: {err:?}"),
+        };
+
+        let multiselect =
+            match MultiSelect::default(CHOOSE_BRANCHES, Some(false), Some(remote_branches)).run() {
+                Ok(branches) => branches,
+                Err(err) => panic!("Unable to select branches: {err:?}"),
+            };
+
+        let confirm = Confirm::default("This action will fail if the branches that you want to pull from conflicts with the branch. You want to continue?", None, None);
+
+        match confirm.run() {
+            Ok(true) => (),
+            Ok(false) => return,
+            Err(err) => panic!("Unable to confirm: {err:?}"),
+        };
+
+        for branch in multiselect {
+            match GitHelper::pull_branch(&repo, &branch) {
+                Ok(_) => println!("Pulling branch: {branch:?}"),
+                Err(err) => panic!("Unable to pull branch: {err:?}"),
+            }
+        }
+    }
+
     fn purge_branches(&mut self) {
         loop {
             let directory = Input::default("Enter the directory:", None, None)
@@ -187,12 +262,34 @@ impl<'a> GitWork<'a> {
 
         let repo = GitHelper::repo(&self.directory.clone().unwrap()).unwrap();
 
+
+
         let local_branches = GitHelper::list_local_branches(&repo).unwrap();
+        
+        let current_branch =
+        GitHelper::current_branch(&repo).expect("Unable to get current branch");
+
+        let local_branches: Vec<String> = local_branches
+            .into_iter()
+            .filter(|b| b != &current_branch)
+            .collect();
+
 
         let multiselect =
             MultiSelect::default(CHOOSE_DELETE_BRANCHES, Some(false), Some(local_branches))
                 .run()
                 .unwrap();
+        
+
+
+
+                let confirm = Confirm::default("This action will delete the branches you choose. You want to continue?", None, None);
+
+                match confirm.run() {
+                    Ok(true) => (),
+                    Ok(false) => return,
+                    Err(err) => panic!("Unable to confirm: {err:?}"),
+                };       
 
         for branch in multiselect {
             GitHelper::delete_branch(&repo, &branch).unwrap();

@@ -32,6 +32,15 @@ impl GitHelper {
         Ok(())
     }
 
+    pub fn fetch_all(repo: &Repository) -> Result<(), git2::Error> {
+        let mut remote = repo.find_remote("origin")?;
+        let mut fo = git2::FetchOptions::new();
+        let callbacks = RemoteCallbacks::new();
+        fo.remote_callbacks(callbacks);
+        remote.fetch(&["refs/heads/*:refs/heads/*"], Some(&mut fo), None)?;
+        Ok(())
+    }
+
     pub fn pull_branch(repo: &Repository, branch: &str) -> Result<(), Error> {
         let mut remote = repo.find_remote("origin")?;
         let mut fo = git2::FetchOptions::new();
