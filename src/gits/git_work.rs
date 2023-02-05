@@ -321,10 +321,7 @@ impl<'a> GitWork<'a> {
         let current_branch =
             GitHelper::current_branch(&repo).expect("Unable to get current branch");
 
-        let local_branches: Vec<String> = local_branches
-            .into_iter()
-            .filter(|b| b != &current_branch)
-            .collect();
+   
 
         //get the difference between local and remote
         let mut remote = GitHelper::remote(&repo);
@@ -340,7 +337,7 @@ impl<'a> GitWork<'a> {
         // filter out remote branches from the local branches
         let local_branches: Vec<String> = local_branches
             .into_iter()
-            .filter(|b| !remote_branches.contains(b))
+            .filter(|b| !remote_branches.contains(b) && b != &current_branch)
             .collect();
         let multiselect =
             match MultiSelect::default(CHOOSE_DELETE_BRANCHES, Some(false), Some(local_branches))
