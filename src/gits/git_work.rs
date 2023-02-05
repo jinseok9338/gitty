@@ -198,7 +198,7 @@ impl<'a> GitWork<'a> {
                 Err(err) => panic!("Unable to pull branch: {err:?}"),
             }
         }
-        println!("🚜 The work is done 🚜")
+        println!("🚜 The work is done 🚜");
     }
 
     fn gitty_sync_soft(&mut self) {
@@ -251,7 +251,7 @@ impl<'a> GitWork<'a> {
                 Err(err) => panic!("Unable to pull branch: {err:?}"),
             }
         }
-        println!("🚜 The work is done 🚜")
+        println!("🚜 The work is done 🚜");
     }
 
     fn purge_branches(&mut self) {
@@ -299,6 +299,6 @@ impl<'a> GitWork<'a> {
             GitHelper::delete_branch(&repo, &branch).unwrap();
             println!("Deleting branch: {branch:?}");
         }
-        println!("🚜 The work is done 🚜")
+        println!("🚜 The work is done 🚜");
     }
 }
