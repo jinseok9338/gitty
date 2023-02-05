@@ -41,14 +41,7 @@ https://user-images.githubusercontent.com/27854958/216049920-e559cb46-87c3-42c3-
 ### you can delete local branches that you don't need anymore
 https://user-images.githubusercontent.com/27854958/216050925-db882257-f6d2-4793-8573-f46c06d72b45.mov
 
-###TODO
-1. should clone private repo with auth provided [done]
-2. error handling when pulling the repo that conflicts with remote[done]
-    - I seperated sync to two commands; hard sync and soft sync
-    - hard sync will delete the local branch and pull the remote branch
-    - soft sync will pull the remote branch and merge it with the local branch 
-3. make config file so you can fine tune how the app works (like auth) [done]
-4. make it as a binary so you can use it in command line tool []
+
 
 
 ## Contributing
