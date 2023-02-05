@@ -91,7 +91,10 @@ impl GitHelper {
 
         let directory = directory.join(project_name);
 
-        let url = Self::change_url(&binding, &settings.git_hub_auth_token);
+        let url = match settings.git_hub_auth_token {
+            Some(token) => Self::change_url(&binding, &token),
+            None => binding,
+        };
 
         let command = format!("git clone {} {}", url, directory.display());
         match run_cmd!(command) {
@@ -127,26 +130,26 @@ impl GitHelper {
                 let client = ClientBuilder::new().build().unwrap();
                 let mut headers = HeaderMap::new();
                 headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
-                let response = if settings.git_hub_auth_token.is_empty() {
-                    client
-                        .get(&repo_url)
-                        .headers(headers)
-                        .header("Accept", "application/vnd.github+json")
-                        .header("X-GitHub-Api-Version", "2022-11-28")
-                        .send()
-                        .await
-                } else {
-                    client
-                        .get(&repo_url)
-                        .headers(headers)
-                        .header("Accept", "application/vnd.github+json")
-                        .header(
-                            "Authorization",
-                            format!("Bearer {}", settings.git_hub_auth_token),
-                        )
-                        .header("X-GitHub-Api-Version", "2022-11-28")
-                        .send()
-                        .await
+                let response = match settings.git_hub_auth_token {
+                    Some(ref token) => {
+                        client
+                            .get(&repo_url)
+                            .headers(headers)
+                            .header("Accept", "application/vnd.github+json")
+                            .header("Authorization", format!("Bearer {}", token))
+                            .header("X-GitHub-Api-Version", "2022-11-28")
+                            .send()
+                            .await
+                    }
+                    None => {
+                        client
+                            .get(&repo_url)
+                            .headers(headers)
+                            .header("Accept", "application/vnd.github+json")
+                            .header("X-GitHub-Api-Version", "2022-11-28")
+                            .send()
+                            .await
+                    }
                 };
                 let response = response.unwrap();
 
