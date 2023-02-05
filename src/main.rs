@@ -1,8 +1,8 @@
 mod arguments;
 mod consts;
 mod gits;
+
 mod setting;
-mod loading_print;
 
 extern crate termion;
 

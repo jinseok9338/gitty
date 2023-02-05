@@ -9,7 +9,10 @@ use reqwest::{
 };
 use tokio::spawn;
 
-use crate::{consts::PROPER_URL_WARNING, run_cmd, setting::read_setting::Settings, loading_print::loading_print::pretty_print_loading};
+use crate::{
+    consts::PROPER_URL_WARNING, run_cmd,
+    setting::read_setting::Settings,
+};
 
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
@@ -96,13 +99,13 @@ impl GitHelper {
         println!("{url}");
 
         let command = format!("git clone {} {}", url, directory.display());
-       
-          match run_cmd!(command) {
+
+        match run_cmd!(command) {
             Ok(_) => (),
             Err(e) => {
-                println!("Error {}",e );
+                println!("Error {}", e);
             }
-          };
+        };
 
         Self::repo(&directory)
     }
