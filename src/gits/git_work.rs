@@ -39,7 +39,7 @@ impl<'a> GitWork<'a> {
 
             UserInput::HardSync(_) => self.gitty_sync_hard(),
             UserInput::SoftSync(_) => self.gitty_sync_soft(), // change it to soft Sync
-
+            UserInput::Diff(_) => self.purge_only_difference(),
             UserInput::Purge(_) => self.purge_branches(),
         }
     }
@@ -282,6 +282,81 @@ impl<'a> GitWork<'a> {
             MultiSelect::default(CHOOSE_DELETE_BRANCHES, Some(false), Some(local_branches))
                 .run()
                 .unwrap();
+
+        let confirm = Confirm::default(
+            "This action will delete the branches you choose. You want to continue?",
+            None,
+            None,
+        );
+
+        match confirm.run() {
+            Ok(true) => (),
+            Ok(false) => return,
+            Err(err) => panic!("Unable to confirm: {err:?}"),
+        };
+
+        for branch in multiselect {
+            GitHelper::delete_branch(&repo, &branch).unwrap();
+            println!("Deleting branch: {branch:?}");
+        }
+        println!("🚜 The work is done 🚜");
+    }
+
+    fn purge_only_difference(&mut self) {
+        loop {
+            let directory = Input::default("Enter the directory:", None, None)
+                .run()
+                .unwrap();
+
+            if PathBuf::from(&directory).exists() {
+                self.directory = Some(PathBuf::from(&directory));
+                break;
+            }
+        }
+
+        let repo = GitHelper::repo(&self.directory.clone().unwrap()).unwrap();
+
+        let local_branches = GitHelper::list_local_branches(&repo).unwrap();
+
+        let current_branch =
+            GitHelper::current_branch(&repo).expect("Unable to get current branch");
+
+        let local_branches: Vec<String> = local_branches
+            .into_iter()
+            .filter(|b| b != &current_branch)
+            .collect();
+
+        //get the difference between local and remote
+        let mut remote = GitHelper::remote(&repo);
+        match remote.connect(Direction::Fetch) {
+            Ok(_) => (),
+            Err(err) => panic!("Unable to connect to remote: {err:?}"),
+        }
+        // get the list of remote branches
+        let remote_branches = match GitHelper::list_remote_branches(&remote) {
+            Ok(branches) => branches,
+            Err(err) => panic!("Unable to list remote branches: {err:?}"),
+        };
+        // filter out remote branches from the local branches
+        let local_branches: Vec<String> = local_branches
+            .into_iter()
+            .filter(|b| !remote_branches.contains(b))
+            .collect();
+        let multiselect =
+            match MultiSelect::default(CHOOSE_DELETE_BRANCHES, Some(false), Some(local_branches))
+                .run()
+            {
+                Ok(branches) => {
+                    if branches.is_empty() {
+                        // exit the program if there is no branches to delete
+                        println!("👋There is no branches difference to delete Bye Bye👋");
+                        return;
+                      
+                    }
+                    branches
+                }
+                Err(err) => panic!("Unable to select branches: {err:?}"),
+            };
 
         let confirm = Confirm::default(
             "This action will delete the branches you choose. You want to continue?",

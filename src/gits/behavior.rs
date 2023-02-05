@@ -6,6 +6,7 @@ pub enum UserInput<'a> {
     HardSync(&'a str),
     SoftSync(&'a str),
     Purge(&'a str),
+    Diff(&'a str),
 }
 
 impl<'a> fmt::Display for UserInput<'a> {
@@ -15,6 +16,7 @@ impl<'a> fmt::Display for UserInput<'a> {
             UserInput::HardSync(_) => write!(f, "hard-sync"),
             UserInput::SoftSync(_) => write!(f, "soft-sync"),
             UserInput::Purge(_) => write!(f, "purge"),
+            UserInput::Diff(_) => write!(f, "diff"),
         }
     }
 }
