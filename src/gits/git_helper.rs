@@ -2,13 +2,14 @@ use std::path::{Path, PathBuf};
 
 use git2::{BranchType, Error, Remote, RemoteCallbacks, Repository};
 
+use indicatif::ProgressBar;
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
     ClientBuilder, Url,
 };
 use tokio::spawn;
 
-use crate::{consts::PROPER_URL_WARNING, run_cmd, setting::read_setting::Settings};
+use crate::{consts::PROPER_URL_WARNING, run_cmd, setting::read_setting::Settings, loading_print::loading_print::pretty_print_loading};
 
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
@@ -95,10 +96,13 @@ impl GitHelper {
         println!("{url}");
 
         let command = format!("git clone {} {}", url, directory.display());
-        match run_cmd!(command) {
-            Ok(_) => {}
-            Err(err) => panic!("Error while cloning repo: {err:?}"),
-        }
+       
+          match run_cmd!(command) {
+            Ok(_) => (),
+            Err(e) => {
+                println!("Error {}",e );
+            }
+          };
 
         Self::repo(&directory)
     }
