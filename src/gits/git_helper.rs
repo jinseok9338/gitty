@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use git2::{BranchType, Error, Remote, RemoteCallbacks, Repository};
 
+use indicatif::ProgressBar;
 use reqwest::{
     header::{HeaderMap, HeaderValue, USER_AGENT},
     ClientBuilder, Url,
@@ -97,10 +98,13 @@ impl GitHelper {
         };
 
         let command = format!("git clone {} {}", url, directory.display());
+
         match run_cmd!(command) {
-            Ok(_) => {}
-            Err(err) => panic!("Error while cloning repo: {err:?}"),
-        }
+            Ok(_) => (),
+            Err(e) => {
+                println!("Error {}", e);
+            }
+        };
 
         Self::repo(&directory)
     }
