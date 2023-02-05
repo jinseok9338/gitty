@@ -47,9 +47,8 @@ https://user-images.githubusercontent.com/27854958/216050925-db882257-f6d2-4793-
     - I seperated sync to two commands; hard sync and soft sync
     - hard sync will delete the local branch and pull the remote branch
     - soft sync will pull the remote branch and merge it with the local branch 
-3. better color theme and welcome banner
-4. need testing
-5. make config file so you can fine tune how the app works (like auth) [done]
+3. make config file so you can fine tune how the app works (like auth) [done]
+4. make it as a binary so you can use it in command line tool []
 
 
 ## Contributing

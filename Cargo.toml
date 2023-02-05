@@ -19,3 +19,6 @@ color-eyre = "0.6.2"
 serde_yaml = "0.9.17"
 indicatif = "0.17.3"
 
+[profile.release]
+lto = true
+debug = false
