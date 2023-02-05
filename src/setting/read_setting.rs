@@ -1,14 +1,17 @@
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Default)]
 pub struct Settings {
-    pub git_hub_auth_token: String,
+    pub git_hub_auth_token: Option<String>,
 }
 
 impl Settings {
     pub fn new() -> Self {
-        let contents = std::fs::read_to_string("./gitty_config.yml").expect("Unable to read file");
-        let settings: Self = serde_yaml::from_str(&contents).expect("Unable to parse YAML");
-        settings
+        //get env
+        let var = option_env!("GITHUB_ACCESS_TOKEN");
+
+        var.map_or_else(Self::default, |v| Self {
+            git_hub_auth_token: Some(v.to_string()),
+        })
     }
 }
