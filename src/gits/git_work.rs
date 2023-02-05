@@ -351,7 +351,6 @@ impl<'a> GitWork<'a> {
                         // exit the program if there is no branches to delete
                         println!("👋There is no branches difference to delete Bye Bye👋");
                         return;
-                      
                     }
                     branches
                 }
