@@ -10,11 +10,8 @@ impl Settings {
         //get env
         let var = option_env!("GITHUB_ACCESS_TOKEN");
 
-        var.map_or_else(
-            Self::default,
-            |v| Self {
-                git_hub_auth_token: Some(v.to_string()),
-            },
-        )
+        var.map_or_else(Self::default, |v| Self {
+            git_hub_auth_token: Some(v.to_string()),
+        })
     }
 }
