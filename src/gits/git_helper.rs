@@ -9,10 +9,7 @@ use reqwest::{
 };
 use tokio::spawn;
 
-use crate::{
-    consts::PROPER_URL_WARNING, run_cmd,
-    setting::read_setting::Settings,
-};
+use crate::{consts::PROPER_URL_WARNING, run_cmd, setting::read_setting::Settings};
 
 use super::r#type::Branch;
 use reqwest::Result as ReqwestResult;
