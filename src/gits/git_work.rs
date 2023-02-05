@@ -321,8 +321,6 @@ impl<'a> GitWork<'a> {
         let current_branch =
             GitHelper::current_branch(&repo).expect("Unable to get current branch");
 
-   
-
         //get the difference between local and remote
         let mut remote = GitHelper::remote(&repo);
         match remote.connect(Direction::Fetch) {
