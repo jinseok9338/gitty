@@ -1,10 +1,9 @@
 use clap::Parser;
 use dialoguer::theme::ColorfulTheme;
 
-use std::io::Result;
-
+use super::common_trait::{Default, Run};
 /// Prompt that returns `true` or `false` (as strings)
-#[derive(Debug, Parser, Default)]
+#[derive(Debug, Parser)]
 pub struct Confirm {
     /// Message for the prompt
     #[clap(short, long)]
@@ -17,10 +16,12 @@ pub struct Confirm {
     /// Sets the default value for the prompt as `true`
     #[clap(short, long)]
     default: bool,
+
+    value: Option<bool>,
 }
 
-impl Confirm {
-    pub fn _run(&self) -> Result<()> {
+impl Run<bool, Box<dyn std::error::Error>> for Confirm {
+    fn run(&self) -> Result<bool, Box<dyn std::error::Error>> {
         let theme = ColorfulTheme::default();
         let mut input = dialoguer::Confirm::with_theme(&theme);
 
@@ -36,10 +37,21 @@ impl Confirm {
 
         if value {
             println!("true");
+            Ok(true)
         } else {
             println!("false");
+            Ok(false)
         }
+    }
+}
 
-        Ok(())
+impl Default<String> for Confirm {
+    fn default(message: &str, _can_be_nullable: Option<bool>, _items: Option<Vec<String>>) -> Self {
+        Self {
+            message: message.to_string(),
+            cancel: false,
+            default: false,
+            value: None,
+        }
     }
 }

@@ -15,6 +15,20 @@ cargo build --release
 
 ```
 
+## Configuration
+1. In order to access private repo, you need to provide the auth token in the either your .bashrc or .zshrc file or you can add it to the environment variable.
+
+```bash
+# .bashrc or .zshrc
+export GITHUB_ACCESS_TOKEN=your_token
+```
+
+then source your .bashrc or .zshrc file
+
+```bash
+# or .zshrc
+source ~/.bashrc
+```
 
 ## Usage
 ### you can can clone the repo to the directory you desire and pull the branches that you can choose from the command prompt
@@ -27,13 +41,7 @@ https://user-images.githubusercontent.com/27854958/216049920-e559cb46-87c3-42c3-
 ### you can delete local branches that you don't need anymore
 https://user-images.githubusercontent.com/27854958/216050925-db882257-f6d2-4793-8573-f46c06d72b45.mov
 
-### TODO
-1. should clone private repo with auth provided
-2. error handling when pulling the repo that conflicts with remote
-3. better color theme and welcome banner
-4. need testing
-5. make config file so you can fine tune how the app works (like auth)
-6. clone the repo through ssh
+
 
 
 ## Contributing

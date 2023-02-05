@@ -2,6 +2,8 @@ mod arguments;
 mod consts;
 mod gits;
 
+mod setting;
+
 extern crate termion;
 
 use arguments::select::Select;
@@ -19,22 +21,16 @@ use crate::{
 async fn main() -> Result<()> {
     color_eyre::install()?;
     println!("{WELCOME_MESSAGE}");
-    let select = Select::default(
-        CHOOSE_COMMAND,
-        None,
-        Some(OPTION_MESSAGES.iter().map(|&s| s.to_string()).collect()),
+
+    // make OPTION_MESSAGES to vec of Userinput
+
+    let select = Select::<UserInput>::default(CHOOSE_COMMAND, None, Some(OPTION_MESSAGES.to_vec()));
+
+    let behavior = select.run();
+    let behavior = behavior.map_or_else(
+        |_| panic!("Error in selecting the option"),
+        |behavior| behavior,
     );
-
-    let behavior = select.run().unwrap();
-
-    let behavior = match behavior.as_str() {
-        "clone the project" => UserInput::Clone(OPTION_MESSAGES[0].to_string()),
-        "sync the existing project with remote repo" => {
-            UserInput::Sync(OPTION_MESSAGES[1].to_string())
-        }
-        "Delete unnecessary branches" => UserInput::Purge(OPTION_MESSAGES[2].to_string()),
-        _ => panic!("Unexpected variant"),
-    };
 
     println!("You selected: {behavior:?}");
 

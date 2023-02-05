@@ -16,4 +16,9 @@ serde = { version = "1.0.130", features = ["derive"] }
 tokio ={ version = "1.24.2", features = ["full"]  }
 futures = "0.3.25"
 color-eyre = "0.6.2"
+serde_yaml = "0.9.17"
+indicatif = "0.17.3"
 
+[profile.release]
+lto = true
+debug = false
